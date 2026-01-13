@@ -1,0 +1,16 @@
+// Test compilation fix
+// AuthResponse is now generic with Object data field
+// This should resolve the BatchController compilation errors
+
+Fixed Issues:
+1. AuthResponse.data is now Object type (was UserDto)
+2. Backward compatibility maintained with getUser() method
+3. BatchController can now pass BatchDto, List<BatchDto>, and Map objects
+
+The compilation errors should be resolved:
+- Line 25: List<BatchDto> -> Object ✓
+- Line 39: BatchDto -> Object ✓  
+- Line 91: BatchDto -> Object ✓
+- Line 102: Map -> Object ✓
+
+Backend should now compile successfully.
