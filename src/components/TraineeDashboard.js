@@ -572,7 +572,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
         <h2 className="section-title">Course Feedback</h2>
         
         <div className="feedback-form">
-          <h3>Submit Feedback</h3>
+          <h3>Course</h3>
           <form onSubmit={handleSubmit}>
             <select 
               className="course-select"
@@ -586,8 +586,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
               ))}
             </select>
             <div className="rating-section">
-              <h4>Ratings</h4>
-              <label>Rating:</label>
+              <h4>Rating</h4>
               <div className="star-rating">
                 {[1,2,3,4,5].map(star => (
                   <span 
