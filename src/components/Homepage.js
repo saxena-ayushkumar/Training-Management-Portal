@@ -113,7 +113,7 @@ const Homepage = ({ onLogin, selectedRole: initialRole, onBack }) => {
                 />
               </div>
               <div className="logo-name">
-                <h1>Trainee Management Portal</h1>
+                <h1>Training Management Portal</h1>
                 <p>Program</p>
               </div>
             </div>

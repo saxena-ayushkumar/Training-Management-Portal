@@ -1,5 +1,6 @@
 package com.trainer.app.service;
 
+import com.trainer.app.dto.SignupRequest;
 import com.trainer.app.model.User;
 import com.trainer.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,5 +86,25 @@ public class UserService {
         }
         
         userRepository.deleteById(traineeId);
+    }
+    
+    public User authenticate(String email, String password) {
+        try {
+            return login(email, password);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    public User createUser(SignupRequest signupRequest) throws Exception {
+        User user = new User();
+        user.setName(signupRequest.getName());
+        user.setEmail(signupRequest.getEmail());
+        user.setPassword(signupRequest.getPassword());
+        user.setRole(signupRequest.getRole());
+        user.setEmpId(signupRequest.getEmpId());
+        user.setTrainerEmpId(signupRequest.getTrainerEmpId());
+        
+        return signup(user);
     }
 }

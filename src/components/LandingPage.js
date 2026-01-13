@@ -13,7 +13,7 @@ const LandingPage = ({ onRoleSelect }) => {
               />
             </div>
             <div className="logo-name">
-              <h1>Trainee Management Portal</h1>
+              <h1>Training Management Portal</h1>
             </div>
           </div>
         </div>
