@@ -25,13 +25,13 @@ const LandingPage = ({ onRoleSelect }) => {
         </p>
         
         <div className="role-selection">
-          <h2>Select Your Role</h2>
+          <h2>Select Your Access Role</h2>
           <div className="role-buttons">
             <button 
               className="role-card trainer-card"
               onClick={() => onRoleSelect('trainer')}
             >
-              <div className="role-icon">👨🏫</div>
+              <div className="role-icon">🏫</div>
               <h3>Trainer</h3>
               <p>Manage trainees, create assignments, and track progress</p>
             </button>
@@ -39,7 +39,7 @@ const LandingPage = ({ onRoleSelect }) => {
               className="role-card trainee-card"
               onClick={() => onRoleSelect('trainee')}
             >
-              <div className="role-icon">👨🎓</div>
+              <div className="role-icon">🎓</div>
               <h3>Trainee</h3>
               <p>Access courses, submit assignments, and track your learning</p>
             </button>

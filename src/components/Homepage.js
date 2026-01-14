@@ -142,7 +142,7 @@ const Homepage = ({ onLogin, selectedRole: initialRole, onBack }) => {
         <div className="homepage-right">
           <div className="auth-container">
             <div className="role-display">
-              <h2>Welcome {selectedRole === 'trainer' ? '👨🏫 Trainer' : '👨🎓 Trainee'}</h2>
+              <h2>Welcome {selectedRole === 'trainer' ? 'Trainer 🏫' : 'Trainee 🎓'}</h2>
               <p>Please login or sign up to continue</p>
             </div>
             
