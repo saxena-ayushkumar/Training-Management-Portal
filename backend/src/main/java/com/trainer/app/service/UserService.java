@@ -68,7 +68,11 @@ public class UserService {
         return userRepository.findPendingTrainees();
     }
     
-    public User approveTrainee(Long traineeId) throws Exception {
+    public List<User> getPendingTraineesByTrainer(String trainerEmpId) {
+        return userRepository.findPendingTraineesByTrainer(trainerEmpId);
+    }
+    
+    public User approveTrainee(Long traineeId, String batchName) throws Exception {
         Optional<User> userOpt = userRepository.findById(traineeId);
         if (userOpt.isEmpty()) {
             throw new Exception("Trainee not found");
@@ -76,6 +80,7 @@ public class UserService {
         
         User user = userOpt.get();
         user.setStatus("approved");
+        user.setBatchName(batchName);
         return userRepository.save(user);
     }
     

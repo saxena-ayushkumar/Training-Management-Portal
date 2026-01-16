@@ -955,7 +955,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
             >
               <img 
-                src="https://tse3.mm.bing.net/th/id/OIP.tTx5ZjiYbrZPsWYgRuxO6gHaHa?w=162&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3" 
+                src="https://cdn-icons-png.flaticon.com/512/6660/6660666.png" 
                 alt="Profile" 
                 style={{
                   width: '100%',

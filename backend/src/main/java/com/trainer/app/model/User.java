@@ -34,6 +34,9 @@ public class User {
     @Column(name = "trainer_emp_id")
     private String trainerEmpId; // For trainees only
     
+    @Column(name = "batch_name")
+    private String batchName; // For trainees - assigned batch
+    
     @Column(nullable = false)
     private String status = "pending"; // "pending", "approved", "rejected"
     
@@ -68,6 +71,9 @@ public class User {
     
     public String getTrainerEmpId() { return trainerEmpId; }
     public void setTrainerEmpId(String trainerEmpId) { this.trainerEmpId = trainerEmpId; }
+    
+    public String getBatchName() { return batchName; }
+    public void setBatchName(String batchName) { this.batchName = batchName; }
     
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

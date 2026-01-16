@@ -17,6 +17,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.role = 'trainee' AND u.status = 'pending'")
     List<User> findPendingTrainees();
     
+    @Query("SELECT u FROM User u WHERE u.role = 'trainee' AND u.status = 'pending' AND u.trainerEmpId = ?1")
+    List<User> findPendingTraineesByTrainer(String trainerEmpId);
+    
     @Query("SELECT u FROM User u WHERE u.role = 'trainer' AND u.empId = ?1")
     Optional<User> findTrainerByEmpId(String empId);
 }

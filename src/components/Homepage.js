@@ -35,8 +35,25 @@ const Homepage = ({ onLogin, selectedRole: initialRole, onBack }) => {
     
     try {
       if (isLogin) {
-        const user = authenticateUser(formData.email, formData.password);
-        onLogin(user);
+        // Call backend login API
+        const response = await fetch('http://localhost:8080/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          onLogin(data.user);
+        } else {
+          throw new Error(data.message || 'Login failed');
+        }
       } else {
         if (formData.password !== formData.confirmPassword) {
           throw new Error('Passwords do not match!');
@@ -50,33 +67,41 @@ const Homepage = ({ onLogin, selectedRole: initialRole, onBack }) => {
           throw new Error('Trainer Employee ID is required for trainees');
         }
         
-        const userData = {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: selectedRole,
-          empId: formData.empId,
-          skills: 'JavaScript, React, Node.js', // Default skills
-          trainerEmpId: selectedRole === 'trainee' ? formData.trainerEmpId : null
-        };
+        // Call backend signup API
+        const response = await fetch('http://localhost:8080/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            role: selectedRole,
+            empId: formData.empId,
+            trainerEmpId: selectedRole === 'trainee' ? formData.trainerEmpId : null
+          })
+        });
         
-        const result = registerUser(userData);
+        const data = await response.json();
         
-        if (result.requestPending) {
-          alert('Registration request submitted! Please wait for trainer approval before logging in.');
-          setFormData({
-            name: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-            empId: '',
-            trainerEmpId: ''
-          });
-        } else {
-          alert('Registration successful!');
-          if (selectedRole === 'trainer') {
-            onLogin(result);
+        if (data.success) {
+          if (selectedRole === 'trainee') {
+            alert('Registration request submitted! Please wait for trainer approval before logging in.');
+            setFormData({
+              name: '',
+              email: '',
+              password: '',
+              confirmPassword: '',
+              empId: '',
+              trainerEmpId: ''
+            });
+          } else {
+            alert('Registration successful!');
+            onLogin(data.user);
           }
+        } else {
+          throw new Error(data.message || 'Signup failed');
         }
       }
     } catch (error) {

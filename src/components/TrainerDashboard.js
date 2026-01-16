@@ -9,12 +9,13 @@ import { useAppContext } from '../context/AppContext';
 const TrainerDashboard = ({ user, onLogout }) => {
   const { 
     courses, addCourse, updateCourse, uploadCourseMaterial, 
-    traineeRequests, approveTraineeRequest, declineTraineeRequest,
+    approveTraineeRequest, declineTraineeRequest,
     sessions, addSession, updateSessionAttendance,
     enrollmentRequests, approveEnrollmentRequest, rejectEnrollmentRequest,
     courseFeedback, leaveRequests, approveLeaveRequest, rejectLeaveRequest,
     batches, addBatch, assignTraineeToBatch
   } = useAppContext();
+  const [traineeRequests, setTraineeRequests] = useState([]);
   const [activeSection, setActiveSection] = useState('analytics');
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showTraineeRequestPopup, setShowTraineeRequestPopup] = useState(false);
@@ -46,11 +47,34 @@ const TrainerDashboard = ({ user, onLogout }) => {
 
   // Check for new trainee requests on component mount and show popup
   useEffect(() => {
-    console.log('Trainee requests:', traineeRequests);
-    if (traineeRequests.length > 0) {
-      setShowTraineeRequestPopup(true);
-    }
-  }, [traineeRequests]);
+    const fetchPendingTrainees = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/trainer/pending-trainees?trainerEmpId=${user.empId}`);
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          // Update traineeRequests with backend data
+          const formattedRequests = data.map(trainee => ({
+            id: trainee.id,
+            name: trainee.name,
+            email: trainee.email,
+            empId: trainee.empId,
+            trainerEmpId: trainee.trainerEmpId,
+            skills: 'JavaScript, React, Node.js',
+            requestDate: new Date().toISOString().split('T')[0],
+            status: trainee.status
+          }));
+          setTraineeRequests(formattedRequests);
+          if (formattedRequests.length > 0) {
+            setShowTraineeRequestPopup(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching pending trainees:', error);
+      }
+    };
+    
+    fetchPendingTrainees();
+  }, [user.empId]);
   
   // Session Management State
   const [newSession, setNewSession] = useState({
@@ -129,18 +153,55 @@ const TrainerDashboard = ({ user, onLogout }) => {
     }
   };
 
-  const handleApproveTrainee = (traineeId, batchName) => {
+  const handleApproveTrainee = async (traineeId, batchName) => {
     if (!batchName) {
       alert('Please select a batch before approving');
       return;
     }
-    approveTraineeRequest(traineeId, batchName);
-    alert('Trainee approved successfully!');
+    
+    try {
+      const response = await fetch(`http://localhost:8080/api/trainer/approve-trainee/${traineeId}?batchName=${encodeURIComponent(batchName)}`, {
+        method: 'POST'
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Remove from local state
+        setTraineeRequests(prev => prev.filter(t => t.id !== traineeId));
+        // Also update context if needed
+        approveTraineeRequest(traineeId, batchName);
+        alert('Trainee approved successfully!');
+      } else {
+        alert('Failed to approve trainee: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error approving trainee:', error);
+      alert('Error approving trainee');
+    }
   };
 
-  const handleRejectTrainee = (traineeId) => {
-    declineTraineeRequest(traineeId);
-    alert('Trainee request declined');
+  const handleRejectTrainee = async (traineeId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/trainer/reject-trainee/${traineeId}`, {
+        method: 'DELETE'
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        // Remove from local state
+        setTraineeRequests(prev => prev.filter(t => t.id !== traineeId));
+        // Also update context if needed
+        declineTraineeRequest(traineeId);
+        alert('Trainee request declined');
+      } else {
+        alert('Failed to reject trainee: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error rejecting trainee:', error);
+      alert('Error rejecting trainee');
+    }
   };
 
   // Session Management Functions
