@@ -50,6 +50,10 @@ const Homepage = ({ onLogin, selectedRole: initialRole, onBack }) => {
         const data = await response.json();
         
         if (data.success) {
+          // Validate role matches selected role
+          if (data.user.role !== selectedRole) {
+            throw new Error(`Invalid credentials. This account is registered as ${data.user.role}, but you selected ${selectedRole} login.`);
+          }
           onLogin(data.user);
         } else {
           throw new Error(data.message || 'Login failed');

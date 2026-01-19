@@ -5,6 +5,7 @@ import {
   PlayCircle, PauseCircle, Activity, TrendingUp, UserCheck, Bell, CalendarDays
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import './TrainerDashboard.css';
 
 const TrainerDashboard = ({ user, onLogout }) => {
   const { 
@@ -15,11 +16,16 @@ const TrainerDashboard = ({ user, onLogout }) => {
     courseFeedback, leaveRequests, approveLeaveRequest, rejectLeaveRequest,
     batches, addBatch, assignTraineeToBatch
   } = useAppContext();
+  // State
+  const [trainees, setTrainees] = useState([]);
+  const [batchesData, setBatchesData] = useState([]);
   const [traineeRequests, setTraineeRequests] = useState([]);
   const [activeSection, setActiveSection] = useState('analytics');
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [showTraineeRequestPopup, setShowTraineeRequestPopup] = useState(false);
   const [selectedBatchForRequest, setSelectedBatchForRequest] = useState({});
+  const [selectedBatch, setSelectedBatch] = useState(null);
+  const [filteredTrainees, setFilteredTrainees] = useState([]);
   
   // Modal States
   const [showCourseModal, setShowCourseModal] = useState(false);
@@ -45,15 +51,50 @@ const TrainerDashboard = ({ user, onLogout }) => {
   
   const [materialFile, setMaterialFile] = useState(null);
 
-  // Check for new trainee requests on component mount and show popup
+  // Filter trainees when batch selection changes
   useEffect(() => {
-    const fetchPendingTrainees = async () => {
+    if (selectedBatch) {
+      setFilteredTrainees(trainees.filter(trainee => trainee.batch === selectedBatch.name));
+    } else {
+      setFilteredTrainees(trainees);
+    }
+  }, [selectedBatch, trainees]);
+
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/trainer/pending-trainees?trainerEmpId=${user.empId}`);
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          // Update traineeRequests with backend data
-          const formattedRequests = data.map(trainee => ({
+        // Fetch batches first
+        const batchesResponse = await fetch(`http://localhost:8080/api/trainer/batches?trainerEmpId=${user.empId}`);
+        const batchesData = await batchesResponse.json();
+        console.log('Fetched batches:', batchesData);
+        if (Array.isArray(batchesData)) {
+          setBatchesData(batchesData);
+        }
+        
+        // Fetch trainees
+        const traineesResponse = await fetch(`http://localhost:8080/api/trainer/trainees?trainerEmpId=${user.empId}`);
+        const traineesData = await traineesResponse.json();
+        if (Array.isArray(traineesData)) {
+          setTrainees(traineesData.map(trainee => ({
+            id: trainee.id,
+            name: trainee.name,
+            email: trainee.email,
+            empId: trainee.empId,
+            batch: trainee.batchName,
+            attendance: trainee.attendance,
+            participation: trainee.participation,
+            enrolledCourses: [trainee.enrolledCourses],
+            courseCompletions: {},
+            status: trainee.status
+          })));
+        }
+        
+        // Fetch pending trainees
+        const pendingResponse = await fetch(`http://localhost:8080/api/trainer/pending-trainees?trainerEmpId=${user.empId}`);
+        const pendingData = await pendingResponse.json();
+        if (Array.isArray(pendingData)) {
+          const formattedRequests = pendingData.map(trainee => ({
             id: trainee.id,
             name: trainee.name,
             email: trainee.email,
@@ -69,11 +110,11 @@ const TrainerDashboard = ({ user, onLogout }) => {
           }
         }
       } catch (error) {
-        console.error('Error fetching pending trainees:', error);
+        console.error('Error fetching data:', error);
       }
     };
     
-    fetchPendingTrainees();
+    fetchData();
   }, [user.empId]);
   
   // Session Management State
@@ -88,20 +129,6 @@ const TrainerDashboard = ({ user, onLogout }) => {
   
   const [selectedSession, setSelectedSession] = useState(null);
   const [attendanceData, setAttendanceData] = useState({});
-  
-  // Trainee Management State
-  const [trainees, setTrainees] = useState([
-    {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      empId: 'EMP001',
-      batch: 'Batch A',
-      attendance: 85,
-      participation: 90,
-      enrolledCourses: [1]
-    }
-  ]);
   
   // Assessment State
   const [assessments, setAssessments] = useState([
@@ -169,8 +196,32 @@ const TrainerDashboard = ({ user, onLogout }) => {
       if (data.success) {
         // Remove from local state
         setTraineeRequests(prev => prev.filter(t => t.id !== traineeId));
-        // Also update context if needed
-        approveTraineeRequest(traineeId, batchName);
+        
+        // Refresh trainees and batches data
+        const traineesResponse = await fetch(`http://localhost:8080/api/trainer/trainees?trainerEmpId=${user.empId}`);
+        const traineesData = await traineesResponse.json();
+        if (Array.isArray(traineesData)) {
+          setTrainees(traineesData.map(trainee => ({
+            id: trainee.id,
+            name: trainee.name,
+            email: trainee.email,
+            empId: trainee.empId,
+            batch: trainee.batchName,
+            attendance: trainee.attendance,
+            participation: trainee.participation,
+            enrolledCourses: [trainee.enrolledCourses],
+            courseCompletions: {},
+            status: trainee.status
+          })));
+        }
+        
+        // Refresh batches
+        const batchesResponse = await fetch(`http://localhost:8080/api/trainer/batches?trainerEmpId=${user.empId}`);
+        const batchesData = await batchesResponse.json();
+        if (Array.isArray(batchesData)) {
+          setBatchesData(batchesData);
+        }
+        
         alert('Trainee approved successfully!');
       } else {
         alert('Failed to approve trainee: ' + data.message);
@@ -231,17 +282,108 @@ const TrainerDashboard = ({ user, onLogout }) => {
     alert('Attendance saved successfully!');
   };
 
-  const handleCreateBatch = (e) => {
+  const handleCreateBatch = async (e) => {
     e.preventDefault();
-    addBatch(newBatch);
-    setNewBatch({ name: '', description: '' });
-    setShowBatchModal(false);
-    alert('Batch created successfully!');
+    try {
+      const response = await fetch('http://localhost:8080/api/trainer/batches', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          name: newBatch.name,
+          description: newBatch.description,
+          trainerEmpId: user.empId
+        })
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        // Refresh batches data
+        const batchesResponse = await fetch(`http://localhost:8080/api/trainer/batches?trainerEmpId=${user.empId}`);
+        const batchesData = await batchesResponse.json();
+        if (Array.isArray(batchesData)) {
+          setBatchesData(batchesData);
+        }
+        
+        setNewBatch({ name: '', description: '' });
+        setShowBatchModal(false);
+        alert('Batch created successfully!');
+      } else {
+        alert('Failed to create batch: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error creating batch:', error);
+      alert('Error creating batch');
+    }
   };
 
   const handleAssignToBatch = (traineeId, batchId) => {
     assignTraineeToBatch(traineeId, parseInt(batchId));
     alert('Trainee assigned to batch successfully!');
+  };
+
+  const handleBatchTransfer = async (traineeId, newBatchName) => {
+    console.log('Transfer request:', { traineeId, newBatchName });
+    
+    if (!newBatchName) {
+      alert('Please select a batch');
+      return;
+    }
+    
+    try {
+      const url = `http://localhost:8080/api/trainer/approve-trainee/${traineeId}?batchName=${encodeURIComponent(newBatchName)}`;
+      console.log('Request URL:', url);
+      
+      const response = await fetch(url, {
+        method: 'POST'
+      });
+      
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Response data:', data);
+      
+      if (data.success) {
+        // Refresh data
+        const traineesResponse = await fetch(`http://localhost:8080/api/trainer/trainees?trainerEmpId=${user.empId}`);
+        const traineesData = await traineesResponse.json();
+        if (Array.isArray(traineesData)) {
+          setTrainees(traineesData.map(trainee => ({
+            id: trainee.id,
+            name: trainee.name,
+            email: trainee.email,
+            empId: trainee.empId,
+            batch: trainee.batchName,
+            attendance: trainee.attendance,
+            participation: trainee.participation,
+            enrolledCourses: [trainee.enrolledCourses],
+            courseCompletions: {},
+            status: trainee.status
+          })));
+        }
+        
+        // Refresh batches
+        const batchesResponse = await fetch(`http://localhost:8080/api/trainer/batches?trainerEmpId=${user.empId}`);
+        const batchesData = await batchesResponse.json();
+        if (Array.isArray(batchesData)) {
+          setBatchesData(batchesData);
+        }
+        
+        alert('Trainee transferred successfully!');
+      } else {
+        alert('Failed to transfer trainee: ' + (data.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Error transferring trainee:', error);
+      alert('Error transferring trainee: ' + error.message);
+    }
   };
 
   const handleEditCourse = (course) => {
@@ -648,81 +790,143 @@ const TrainerDashboard = ({ user, onLogout }) => {
         </button>
       </div>
       
+      {/* Pending Trainee Requests */}
+      {traineeRequests.length > 0 && (
+        <div className="pending-requests-section">
+          <h3>Pending Trainee Requests ({traineeRequests.length})</h3>
+          <div className="requests-grid">
+            {traineeRequests.map(trainee => (
+              <div key={trainee.id} className="trainee-request-card">
+                <div className="trainee-request-header">
+                  <div className="trainee-info">
+                    <div className="trainee-name">{trainee.name}</div>
+                    <div className="trainee-email">{trainee.email}</div>
+                    <div className="trainee-skills">Skills: {trainee.skills}</div>
+                  </div>
+                  <div className="trainee-actions">
+                    <div className="batch-selection">
+                      <label>Assign to Batch:</label>
+                      <select 
+                        value={selectedBatchForRequest[trainee.id] || ''}
+                        onChange={(e) => setSelectedBatchForRequest(prev => ({...prev, [trainee.id]: e.target.value}))}
+                      >
+                        <option value="">Select Batch</option>
+                        {batchesData.map(batch => (
+                          <option key={batch.id} value={batch.name}>{batch.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="action-buttons">
+                      <button 
+                        className="accept-btn"
+                        onClick={() => handleApproveTrainee(trainee.id, selectedBatchForRequest[trainee.id])}
+                        disabled={!selectedBatchForRequest[trainee.id]}
+                      >
+                        ✓ Approve
+                      </button>
+                      <button 
+                        className="decline-btn"
+                        onClick={() => handleRejectTrainee(trainee.id)}
+                      >
+                        ✗ Decline
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Batch Overview */}
       <div className="batch-overview">
         <h3>Batches</h3>
         <div className="batches-grid">
-          {batches.map(batch => (
-            <div key={batch.id} className="batch-card">
+          <div 
+            className={`batch-card ${!selectedBatch ? 'selected' : ''}`}
+            onClick={() => setSelectedBatch(null)}
+          >
+            <h4>All Batches</h4>
+            <p>View all trainees</p>
+            <span className="trainee-count">{trainees.length} trainees</span>
+          </div>
+          {batchesData.map(batch => (
+            <div 
+              key={batch.id} 
+              className={`batch-card ${selectedBatch?.id === batch.id ? 'selected' : ''}`}
+              onClick={() => setSelectedBatch(batch)}
+            >
               <h4>{batch.name}</h4>
               <p>{batch.description}</p>
-              <span className="trainee-count">{batch.trainees.length} trainees</span>
+              <span className="trainee-count">{batch.traineeCount} trainees</span>
             </div>
           ))}
         </div>
       </div>
       
-      <div className="trainees-grid">
-        {trainees.map(trainee => (
-          <div key={trainee.id} className="trainee-card">
-            <div className="trainee-header">
-              <div className="trainee-avatar">
-                <img 
-                  src={trainee.profilePicture || "https://via.placeholder.com/50"} 
-                  alt="Trainee" 
-                  style={{
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '50%',
-                    objectFit: 'cover'
-                  }}
-                />
-              </div>
-              <div className="trainee-info">
-                <h3>{trainee.name}</h3>
-                <span className="batch-badge">{batches.find(b => b.trainees.includes(trainee.id))?.name || 'No Batch'}</span>
-              </div>
+      {/* Trainee Details */}
+      <div className="trainee-details-section">
+        <h3>{selectedBatch ? `Trainees in ${selectedBatch.name}` : 'All Trainees'}</h3>
+        <div className="trainee-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Employee ID</th>
+                <th>Email</th>
+                <th>Batch</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredTrainees.map(trainee => (
+                <tr key={trainee.id}>
+                  <td>
+                    <div className="trainee-cell">
+                      <img 
+                        src={trainee.profilePicture || "https://via.placeholder.com/30"} 
+                        alt="Trainee" 
+                        className="table-avatar"
+                      />
+                      {trainee.name}
+                    </div>
+                  </td>
+                  <td>{trainee.empId}</td>
+                  <td>{trainee.email}</td>
+                  <td>
+                    <span className="batch-badge">
+                      {trainee.batch || 'No Batch'}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`status-badge ${trainee.status || 'active'}`}>
+                      {trainee.status || 'Active'}
+                    </span>
+                  </td>
+                  <td>
+                    <select 
+                      value={trainee.batch || ''}
+                      onChange={(e) => handleBatchTransfer(trainee.id, e.target.value)}
+                      className="batch-transfer-select"
+                    >
+                      <option value="">No Batch</option>
+                      {batchesData.map(batch => (
+                        <option key={batch.id} value={batch.name}>{batch.name}</option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filteredTrainees.length === 0 && (
+            <div className="no-data">
+              {selectedBatch ? `No trainees found in ${selectedBatch.name}` : 'No trainees found'}
             </div>
-            <div className="trainee-details">
-              <p>Email: {trainee.email}</p>
-              <p>Employee ID: {trainee.empId}</p>
-              {trainee.resumeLink && (
-                <p>
-                  <a href="#" className="resume-link">
-                    📄 View Resume: {trainee.resumeLink}
-                  </a>
-                </p>
-              )}
-            </div>
-            <div className="batch-assignment">
-              <label>Assign to Batch:</label>
-              <select 
-                value={batches.find(b => b.trainees.includes(trainee.id))?.id || ''}
-                onChange={(e) => handleAssignToBatch(trainee.id, e.target.value)}
-              >
-                <option value="">Select Batch</option>
-                {batches.map(batch => (
-                  <option key={batch.id} value={batch.id}>{batch.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="trainee-metrics">
-              <div className="metric">
-                <span className="metric-label">Attendance</span>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{width: `${trainee.attendance}%`}}></div>
-                </div>
-                <span className="metric-value">{trainee.attendance}%</span>
-              </div>
-              <div className="metric">
-                <span className="metric-label">Participation</span>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{width: `${trainee.participation}%`}}></div>
-                </div>
-                <span className="metric-value">{trainee.participation}%</span>
-              </div>
-            </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
     </div>
   );
@@ -1157,8 +1361,6 @@ const TrainerDashboard = ({ user, onLogout }) => {
                 <th>Employee ID</th>
                 <th>Email</th>
                 <th>Batch</th>
-                <th>Attendance</th>
-                <th>Participation</th>
                 <th>Enrolled Courses</th>
                 <th>Course Completion</th>
                 <th>Status</th>
@@ -1183,24 +1385,8 @@ const TrainerDashboard = ({ user, onLogout }) => {
                     <td>{trainee.email}</td>
                     <td>
                       <span className="batch-badge">
-                        {assignedBatch?.name || 'No Batch'}
+                        {trainee.batch || 'No Batch'}
                       </span>
-                    </td>
-                    <td>
-                      <div className="progress-cell">
-                        <span>{trainee.attendance}%</span>
-                        <div className="mini-progress-bar">
-                          <div className="mini-progress-fill" style={{width: `${trainee.attendance}%`}}></div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="progress-cell">
-                        <span>{trainee.participation}%</span>
-                        <div className="mini-progress-bar">
-                          <div className="mini-progress-fill" style={{width: `${trainee.participation}%`}}></div>
-                        </div>
-                      </div>
                     </td>
                     <td>{trainee.enrolledCourses?.length || 0}</td>
                     <td>
@@ -1250,12 +1436,12 @@ const TrainerDashboard = ({ user, onLogout }) => {
             <span className="notification-count">{traineeRequests.length + enrollmentRequests.length}</span>
           </div>
           <div className="profile-dropdown-container">
-            <div 
-              className="profile-avatar" 
+            <img 
+              src="https://cdn-icons-png.flaticon.com/512/6660/6660666.png"
+              alt="Profile"
+              className="profile-avatar-image" 
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-            >
-              <User size={20} />
-            </div>
+            />
             {showProfileDropdown && (
               <div className="profile-dropdown">
                 <div className="dropdown-item" onClick={() => {
@@ -1338,8 +1524,8 @@ const TrainerDashboard = ({ user, onLogout }) => {
                               onChange={(e) => setSelectedBatchForRequest(prev => ({...prev, [trainee.id]: e.target.value}))}
                             >
                               <option value="">Select Batch</option>
-                              {courses.filter(c => c.status === 'active').map(course => (
-                                <option key={course.id} value={course.title}>{course.title}</option>
+                              {batchesData.map(batch => (
+                                <option key={batch.id} value={batch.name}>{batch.name}</option>
                               ))}
                             </select>
                           </div>

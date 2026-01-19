@@ -81,7 +81,11 @@ public class UserService {
         User user = userOpt.get();
         user.setStatus("approved");
         user.setBatchName(batchName);
-        return userRepository.save(user);
+        
+        // Save the user
+        User savedUser = userRepository.save(user);
+        
+        return savedUser;
     }
     
     public void rejectTrainee(Long traineeId) throws Exception {
@@ -111,5 +115,21 @@ public class UserService {
         user.setTrainerEmpId(signupRequest.getTrainerEmpId());
         
         return signup(user);
+    }
+    
+    public User transferTrainee(Long traineeId, String newBatchName) throws Exception {
+        Optional<User> userOpt = userRepository.findById(traineeId);
+        if (userOpt.isEmpty()) {
+            throw new Exception("Trainee not found");
+        }
+        
+        User user = userOpt.get();
+        if (newBatchName == null || newBatchName.trim().isEmpty()) {
+            throw new Exception("Batch name cannot be empty");
+        }
+        
+        user.setBatchName(newBatchName.trim());
+        
+        return userRepository.save(user);
     }
 }

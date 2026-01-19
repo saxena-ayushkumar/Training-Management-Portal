@@ -1,0 +1,247 @@
+/* Additional styles for enhanced trainee management */
+
+.pending-requests-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #ff6b6b;
+}
+
+.pending-requests-section h3 {
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}
+
+.requests-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.batch-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.batch-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.batch-card.selected {
+  border-color: #4CAF50;
+  background: #f0f8f0;
+}
+
+.batch-transfer-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 0.9rem;
+}
+
+.batch-transfer-select:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.trainee-details-section {
+  margin-top: 2rem;
+}
+
+.trainee-details-section h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #4CAF50;
+}
+
+.trainee-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.trainee-table th {
+  background: #4CAF50;
+  color: white;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.trainee-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.trainee-table tr:hover {
+  background: #f8f9fa;
+}
+
+.trainee-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.batch-badge {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-badge.active {
+  background: #e8f5e8;
+  color: #2e7d32;
+}
+
+.status-badge.pending {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+.trainee-request-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-left: 4px solid #ff9800;
+}
+
+.trainee-request-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.trainee-info {
+  flex: 1;
+}
+
+.trainee-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.trainee-email {
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.trainee-skills {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.trainee-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 200px;
+}
+
+.batch-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.batch-selection label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.batch-selection select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.accept-btn, .decline-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.accept-btn {
+  background: #4CAF50;
+  color: white;
+}
+
+.accept-btn:hover:not(:disabled) {
+  background: #45a049;
+}
+
+.accept-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.decline-btn {
+  background: #f44336;
+  color: white;
+}
+
+.decline-btn:hover {
+  background: #da190b;
+}
+
+@media (max-width: 768px) {
+  .trainee-request-header {
+    flex-direction: column;
+  }
+  
+  .trainee-actions {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}

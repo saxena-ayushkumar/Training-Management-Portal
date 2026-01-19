@@ -29,12 +29,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.TrainerAppApplication.executor": "Run",
+    "Application.TrainerAppApplication.executor": "Debug",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "sree",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/New/trainer-trainee-app/backend",
+    "last_opened_file_path": "C:/Users/2423035/OneDrive - Cognizant/Desktop/GitHub/Training-Management-Portal/backend",
     "settings.editor.selected.configurable": "MavenSettings"
   }
 }]]></component>
@@ -78,16 +78,5 @@
       <updated>1767085843826</updated>
     </task>
     <servers />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/trainer/app/TrainerAppApplication.java</url>
-          <line>6</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

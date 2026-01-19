@@ -950,21 +950,12 @@ const TraineeDashboard = ({ user, onLogout }) => {
         <div className="user-info">
           <span>Welcome, {user.name}</span>
           <div className="profile-dropdown-container">
-            <div 
-              className="profile-avatar" 
+            <img 
+              src="https://cdn-icons-png.flaticon.com/512/6660/6660666.png"
+              alt="Profile"
+              className="profile-avatar-image" 
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-            >
-              <img 
-                src="https://cdn-icons-png.flaticon.com/512/6660/6660666.png" 
-                alt="Profile" 
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
-              />
-            </div>
+            />
             {showProfileDropdown && (
               <div className="profile-dropdown">
                 <div className="dropdown-item logout" onClick={onLogout}>

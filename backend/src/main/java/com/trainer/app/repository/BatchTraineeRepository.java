@@ -16,8 +16,8 @@ public interface BatchTraineeRepository extends JpaRepository<BatchTrainee, Long
     
     List<BatchTrainee> findByTraineeId(Long traineeId);
     
-    @Query("SELECT bt FROM BatchTrainee bt WHERE bt.batch.trainerId = :trainerId")
-    List<BatchTrainee> findByTrainerId(@Param("trainerId") Long trainerId);
+    @Query("SELECT bt FROM BatchTrainee bt WHERE bt.batch.trainerEmpId = :trainerEmpId")
+    List<BatchTrainee> findByTrainerEmpId(@Param("trainerEmpId") String trainerEmpId);
     
     Optional<BatchTrainee> findByBatchIdAndTraineeId(Long batchId, Long traineeId);
     

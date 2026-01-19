@@ -1,6 +1,9 @@
 package com.trainer.app.controller;
 
+import com.trainer.app.dto.BatchWithTraineesDto;
+import com.trainer.app.dto.TraineeDetailsDto;
 import com.trainer.app.model.User;
+import com.trainer.app.service.BatchService;
 import com.trainer.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,9 @@ public class TrainerController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private BatchService batchService;
 
     @GetMapping("/pending-trainees")
     public ResponseEntity<?> getPendingTrainees(@RequestParam String trainerEmpId) {
@@ -27,6 +33,48 @@ public class TrainerController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", "Failed to fetch pending trainees: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+    
+    @GetMapping("/batches")
+    public ResponseEntity<?> getBatches(@RequestParam String trainerEmpId) {
+        try {
+            List<BatchWithTraineesDto> batches = batchService.getBatchesByTrainer(trainerEmpId);
+            return ResponseEntity.ok(batches);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Failed to fetch batches: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+    
+    @GetMapping("/trainees")
+    public ResponseEntity<?> getTrainees(@RequestParam String trainerEmpId) {
+        try {
+            List<TraineeDetailsDto> trainees = batchService.getTraineesByTrainer(trainerEmpId);
+            return ResponseEntity.ok(trainees);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Failed to fetch trainees: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+    
+    @PostMapping("/batches")
+    public ResponseEntity<?> createBatch(@RequestParam String name, @RequestParam String description, @RequestParam String trainerEmpId) {
+        try {
+            batchService.createBatch(name, description, trainerEmpId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Batch created successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Failed to create batch: " + e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
     }
