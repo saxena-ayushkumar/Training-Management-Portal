@@ -28,5 +28,8 @@ backend/.mvn/wrapper/maven-wrapper.jar
 *.log
 .env
 
-#directory
+# Configuration files with credentials
+backend/src/main/resources/application.properties
+
+# Directory
 node_modules/
