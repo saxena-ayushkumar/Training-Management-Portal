@@ -23,6 +23,7 @@ Thumbs.db
 # Backend
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
+backend/.idea/
 
 # Logs
 *.log
@@ -33,3 +34,10 @@ backend/src/main/resources/application.properties
 
 # Directory
 node_modules/
+
+# Compiled class files
+*.class
+
+# Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
