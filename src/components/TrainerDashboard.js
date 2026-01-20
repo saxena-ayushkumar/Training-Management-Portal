@@ -885,11 +885,11 @@ const TrainerDashboard = ({ user, onLogout }) => {
                 <tr key={trainee.id}>
                   <td>
                     <div className="trainee-cell">
-                      <img 
+                      {/* <img 
                         src={trainee.profilePicture || "https://via.placeholder.com/30"} 
                         alt="Trainee" 
                         className="table-avatar"
-                      />
+                      /> */}
                       {trainee.name}
                     </div>
                   </td>
@@ -1373,11 +1373,11 @@ const TrainerDashboard = ({ user, onLogout }) => {
                   <tr key={trainee.id}>
                     <td>
                       <div className="trainee-cell">
-                        <img 
+                        {/* <img 
                           src={trainee.profilePicture || "https://via.placeholder.com/30"} 
                           alt="Trainee" 
                           className="table-avatar"
-                        />
+                        /> */}
                         {trainee.name}
                       </div>
                     </td>
@@ -1421,7 +1421,6 @@ const TrainerDashboard = ({ user, onLogout }) => {
     { id: 'trainees', label: 'Trainee Management', icon: Users },
     { id: 'assessments', label: 'Assessments', icon: Award },
     { id: 'leave', label: 'Leave Management', icon: CalendarDays },
-    { id: 'reports', label: 'Reports & Insights', icon: BarChart3 },
     { id: 'attendance', label: 'Attendance Tracker', icon: CheckCircle }
   ];
 
@@ -1483,7 +1482,6 @@ const TrainerDashboard = ({ user, onLogout }) => {
           {activeSection === 'trainees' && renderTraineeManagement()}
           {activeSection === 'assessments' && renderAssessments()}
           {activeSection === 'leave' && renderLeaveManagement()}
-          {activeSection === 'reports' && renderReports()}
           {activeSection === 'attendance' && renderAttendanceTracker()}
           {activeSection === 'profile' && renderProfile()}
         </div>
