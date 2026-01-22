@@ -34,7 +34,11 @@ const TrainerDashboard = ({ user, onLogout }) => {
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    empId: user?.empId || ''
+    empId: user?.empId || '',
+    phoneNumber: user?.phoneNumber || '',
+    skills: user?.skills || '',
+    yearsOfExperience: user?.yearsOfExperience || '',
+    address: user?.address || ''
   });
   
   // Modal States
@@ -1787,6 +1791,53 @@ const TrainerDashboard = ({ user, onLogout }) => {
                 value={profileData.email}
                 onChange={(e) => setProfileData({...profileData, email: e.target.value})}
                 disabled={!isEditingProfile}
+              />
+            </div>
+            <div className="form-group">
+              <label>Phone Number</label>
+              <input 
+                type="tel"
+                value={profileData.phoneNumber}
+                onChange={(e) => setProfileData({...profileData, phoneNumber: e.target.value})}
+                disabled={!isEditingProfile}
+                placeholder="Enter phone number"
+              />
+            </div>
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label>Years of Experience</label>
+              <input 
+                type="number"
+                value={profileData.yearsOfExperience}
+                onChange={(e) => setProfileData({...profileData, yearsOfExperience: e.target.value})}
+                disabled={!isEditingProfile}
+                placeholder="Enter years of experience"
+                min="0"
+              />
+            </div>
+            <div className="form-group">
+              <label>Skills</label>
+              <textarea 
+                value={profileData.skills}
+                onChange={(e) => setProfileData({...profileData, skills: e.target.value})}
+                disabled={!isEditingProfile}
+                placeholder="Enter your skills (e.g., Java, React, Spring Boot)"
+                rows="3"
+              />
+            </div>
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label>Address</label>
+              <textarea 
+                value={profileData.address}
+                onChange={(e) => setProfileData({...profileData, address: e.target.value})}
+                disabled={!isEditingProfile}
+                placeholder="Enter your address"
+                rows="3"
               />
             </div>
           </div>

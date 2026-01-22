@@ -152,15 +152,22 @@ public class TrainerController {
     }
     
     @PutMapping("/{empId}")
-    public ResponseEntity<Map<String, Object>> updateTrainer(@PathVariable String empId, @RequestBody Map<String, String> updates) {
+    public ResponseEntity<Map<String, Object>> updateTrainer(@PathVariable String empId, @RequestBody Map<String, Object> updates) {
         Map<String, Object> response = new HashMap<>();
         
         try {
             User trainer = userService.findByEmpId(empId);
             
             if (trainer != null && "trainer".equals(trainer.getRole())) {
-                if (updates.containsKey("name")) trainer.setName(updates.get("name"));
-                if (updates.containsKey("email")) trainer.setEmail(updates.get("email"));
+                if (updates.containsKey("name")) trainer.setName((String) updates.get("name"));
+                if (updates.containsKey("email")) trainer.setEmail((String) updates.get("email"));
+                if (updates.containsKey("phoneNumber")) trainer.setPhoneNumber((String) updates.get("phoneNumber"));
+                if (updates.containsKey("skills")) trainer.setSkills((String) updates.get("skills"));
+                if (updates.containsKey("yearsOfExperience")) {
+                    Object exp = updates.get("yearsOfExperience");
+                    trainer.setYearsOfExperience(exp != null ? Integer.valueOf(exp.toString()) : null);
+                }
+                if (updates.containsKey("address")) trainer.setAddress((String) updates.get("address"));
                 
                 userService.saveUser(trainer);
                 

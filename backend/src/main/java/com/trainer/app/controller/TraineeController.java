@@ -55,18 +55,26 @@ public class TraineeController {
     }
 
     @PutMapping("/{empId}")
-    public ResponseEntity<Map<String, Object>> updateTrainee(@PathVariable String empId, @RequestBody Map<String, String> updates) {
+    public ResponseEntity<Map<String, Object>> updateTrainee(@PathVariable String empId, @RequestBody Map<String, Object> updates) {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            Optional<User> userOpt = userRepository.findByEmpId(empId);
+            User trainee = userService.findByEmpId(empId);
             
-            if (userOpt.isPresent()) {
-                User user = userOpt.get();
-                if (updates.containsKey("name")) user.setName(updates.get("name"));
-                if (updates.containsKey("email")) user.setEmail(updates.get("email"));
+            if (trainee != null && "trainee".equals(trainee.getRole())) {
+                if (updates.containsKey("name")) trainee.setName((String) updates.get("name"));
+                if (updates.containsKey("email")) trainee.setEmail((String) updates.get("email"));
+                if (updates.containsKey("phone")) trainee.setPhoneNumber((String) updates.get("phone"));
+                if (updates.containsKey("skills")) trainee.setSkills((String) updates.get("skills"));
+                if (updates.containsKey("experience")) {
+                    Object exp = updates.get("experience");
+                    if (exp instanceof String) {
+                        trainee.setAddress((String) exp); // Using address field for experience description
+                    }
+                }
+                if (updates.containsKey("address")) trainee.setAddress((String) updates.get("address"));
                 
-                userRepository.save(user);
+                userService.saveUser(trainee);
                 
                 response.put("success", true);
                 response.put("message", "Trainee profile updated successfully");

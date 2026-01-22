@@ -50,14 +50,31 @@ const TraineeDashboard = ({ user, onLogout }) => {
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: user?.phone || '',
+    phone: user?.phoneNumber || '',
     empId: user?.empId || '',
-    batch: user?.batch || '',
-    education: user?.education || '',
+    batch: user?.batchName || '',
+    education: '', // This will be stored in a separate field if needed
     skills: user?.skills || '',
-    experience: user?.experience || '',
+    experience: user?.address || '', // Using address field for experience
     address: user?.address || ''
   });
+
+  // Initialize profile data when user data is available
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phoneNumber || '',
+        empId: user.empId || '',
+        batch: user.batchName || '',
+        education: '', // This can be added to User model if needed
+        skills: user.skills || '',
+        experience: user.address || '', // Using address field for experience
+        address: user.address || ''
+      });
+    }
+  }, [user]);
 
   // Fetch functions
   const fetchAssessments = async () => {

@@ -40,6 +40,18 @@ public class User {
     @Column(nullable = false)
     private String status = "pending"; // "pending", "approved", "rejected"
     
+    @Column(name = "phone_number")
+    private String phoneNumber;
+    
+    @Column(columnDefinition = "TEXT")
+    private String skills;
+    
+    @Column(name = "years_of_experience")
+    private Integer yearsOfExperience;
+    
+    @Column(columnDefinition = "TEXT")
+    private String address;
+    
     // Constructors
     public User() {}
     
@@ -77,4 +89,16 @@ public class User {
     
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    
+    public String getSkills() { return skills; }
+    public void setSkills(String skills) { this.skills = skills; }
+    
+    public Integer getYearsOfExperience() { return yearsOfExperience; }
+    public void setYearsOfExperience(Integer yearsOfExperience) { this.yearsOfExperience = yearsOfExperience; }
+    
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 }
