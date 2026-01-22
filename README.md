@@ -12,7 +12,6 @@ A comprehensive full-stack training management platform built with React.js and 
 - **Assessment Creation** - Create assignments, quizzes, and exams
 - **Trainee Approval** - Review and approve trainee registrations
 - **Leave Management** - Handle trainee leave requests
-- **Attendance Tracking** - Mark and monitor session attendance
 - **Certificate Management** - View and download trainee certificates
 
 ### For Trainees
@@ -20,7 +19,7 @@ A comprehensive full-stack training management platform built with React.js and 
 - **Assignment Submission** - Submit assignments with file uploads
 - **Progress Tracking** - Monitor learning progress and grades
 - **Leave Requests** - Submit and track leave applications
-- **Certificate Access** - View and download completion certificates
+- **Certificate Submission** - Able to uplaod completion certificates for courses took
 - **Feedback System** - Provide course feedback and ratings
 
 ##  Technology Stack
@@ -187,9 +186,9 @@ The application is fully responsive and works on:
 
 ##  Known Issues & Limitations
 
-- Password storage uses plain text (should implement hashing)
+- Password storage uses plain text (hashing can be implemented)
 - No JWT token authentication
-- File uploads stored locally (consider cloud storage)
+- File uploads stored locally (cloud storage can be considered)
 - Limited real-time notifications
 
 ##  Future Enhancements
@@ -198,7 +197,7 @@ The application is fully responsive and works on:
 - [ ] Real-time notifications with WebSocket
 - [ ] Email notification system
 - [ ] Advanced analytics and reporting
-- [ ] Video conferencing integration
+- [ ] Attendance tracking for scheduled session
 - [ ] Mobile application
 - [ ] Cloud file storage integration
 - [ ] Advanced role permissions
