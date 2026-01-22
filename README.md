@@ -1,4 +1,4 @@
-# Training Management System
+# Training Management Portal
 
 A comprehensive full-stack training management platform built with React.js and Spring Boot, designed to streamline the training process between trainers and trainees.
 
