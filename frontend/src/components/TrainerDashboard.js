@@ -232,7 +232,7 @@ const TrainerDashboard = ({ user, onLogout }) => {
             email: trainee.email,
             empId: trainee.empId,
             trainerEmpId: trainee.trainerEmpId,
-            skills: 'JavaScript, React, Node.js',
+            // skills: 'JavaScript, React, Node.js',
             requestDate: new Date().toISOString().split('T')[0],
             status: trainee.status
           }));
@@ -1244,7 +1244,7 @@ const TrainerDashboard = ({ user, onLogout }) => {
                   <div className="trainee-info">
                     <div className="trainee-name">{trainee.name}</div>
                     <div className="trainee-email">{trainee.email}</div>
-                    <div className="trainee-skills">Skills: {trainee.skills}</div>
+                    {/* <div className="trainee-skills">Skills: {trainee.skills}</div> */}
                   </div>
                   <div className="trainee-actions">
                     <div className="batch-selection">
@@ -2215,7 +2215,7 @@ const TrainerDashboard = ({ user, onLogout }) => {
                         <div className="trainee-info">
                           <div className="trainee-name">{trainee.name}</div>
                           <div className="trainee-email">{trainee.email}</div>
-                          <div className="trainee-skills">Skills: {trainee.skills}</div>
+                          {/* <div className="trainee-skills">Skills: {trainee.skills}</div> */}
                           <div className="request-type">Type: New Trainee Registration</div>
                         </div>
                         <div className="trainee-actions">

@@ -202,24 +202,28 @@ const TraineeDashboard = ({ user, onLogout }) => {
                 return {
                   ...course,
                   enrolled: true,
-                  progress: course.progressPercentage || Math.floor(Math.random() * 100),
+                  progress: course.progressPercentage || 0,
                   completedLessons: Math.floor(Math.random() * 20),
                   totalLessons: 20,
                   nextSession: '2024-01-20 10:00 AM',
                   score: Math.floor(Math.random() * 100),
-                  certificateUploaded: certData.hasCertificate || false
+                  certificateUploaded: certData.hasCertificate || false,
+                  started: course.progressPercentage > 0,
+                  completed: course.progressPercentage === 100
                 };
               } catch (error) {
                 console.error('Error checking certificate for course', course.id, error);
                 return {
                   ...course,
                   enrolled: true,
-                  progress: course.progressPercentage || Math.floor(Math.random() * 100),
+                  progress: course.progressPercentage || 0,
                   completedLessons: Math.floor(Math.random() * 20),
                   totalLessons: 20,
                   nextSession: '2024-01-20 10:00 AM',
                   score: Math.floor(Math.random() * 100),
-                  certificateUploaded: false
+                  certificateUploaded: false,
+                  started: course.progressPercentage > 0,
+                  completed: course.progressPercentage === 100
                 };
               }
             })
@@ -237,7 +241,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
         const activeCourses = courses.filter(course => course.status === 'active').map(course => ({
           ...course,
           enrolled: true,
-          progress: Math.floor(Math.random() * 100),
+          progress: 0,
           completedLessons: Math.floor(Math.random() * 20),
           totalLessons: 20,
           nextSession: '2024-01-20 10:00 AM',
@@ -398,7 +402,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
                             const data = await response.json();
                             if (data.success) {
                               setEnrolledCourses(prev => prev.map(c => 
-                                c.id === course.id ? { ...c, started: true } : c
+                                c.id === course.id ? { ...c, started: true, progress: 1 } : c
                               ));
                               alert('Course started successfully!');
                             } else {
@@ -408,7 +412,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
                             console.error('Backend not available, using local state:', error);
                             // Fallback to local state if backend is not available
                             setEnrolledCourses(prev => prev.map(c => 
-                              c.id === course.id ? { ...c, started: true } : c
+                              c.id === course.id ? { ...c, started: true, progress: 1 } : c
                             ));
                             alert('Course started successfully!');
                           }
@@ -530,12 +534,12 @@ const TraineeDashboard = ({ user, onLogout }) => {
                 <div className="progress-input-container">
                   <input 
                     type="number" 
-                    min="0" 
-                    max="100" 
+                    min="1" 
+                    max="99" 
                     value={course.progress || ''}
                     onChange={async (e) => {
                       const value = e.target.value;
-                      const newProgress = value === '' ? 0 : Math.min(100, Math.max(0, parseInt(value) || 0));
+                      const newProgress = value === '' ? 1 : Math.min(99, Math.max(1, parseInt(value) || 1));
                       
                       // Update local state immediately
                       setEnrolledCourses(prev => prev.map(c => 
@@ -565,7 +569,8 @@ const TraineeDashboard = ({ user, onLogout }) => {
                       }
                     }}
                     className="progress-input"
-                    placeholder="0"
+                    placeholder="1"
+                    disabled={course.completed || !course.started}
                   />
                   <span className="progress-percent">%</span>
                 </div>
@@ -874,7 +879,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
             const completeData = await completeResponse.json();
             if (completeData.success) {
               setEnrolledCourses(prev => prev.map(c => 
-                c.id === parseInt(selectedCourse) ? { ...c, completed: true } : c
+                c.id === parseInt(selectedCourse) ? { ...c, completed: true, progress: 100 } : c
               ));
               alert('Feedback submitted successfully! Course marked as completed.');
             } else {
@@ -884,7 +889,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
             console.error('Error completing course:', error);
             // Still mark as completed locally if backend fails
             setEnrolledCourses(prev => prev.map(c => 
-              c.id === parseInt(selectedCourse) ? { ...c, completed: true } : c
+              c.id === parseInt(selectedCourse) ? { ...c, completed: true, progress: 100 } : c
             ));
             alert('Feedback submitted successfully! Course marked as completed.');
           }
