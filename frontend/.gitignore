@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+build/
+dist/
+
+# Cache
+.cache/
+*.cache
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/.idea/
+
+# Logs
+*.log
+
+# Environment variables and sensitive data
+.env
+.env.local
+.env.production
+*.env
+
+# Configuration files with credentials
+backend/src/main/resources/application-local.properties
+
+# Database credentials
+**/application.properties
+
+# Directory
+node_modules/
+
+# Compiled class files
+*.class
+
+# Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Sensitive files
+*password*
+*secret*
+*key*
+*.pem
+*.p12
+*.jks
