@@ -43,9 +43,6 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
     
-    @Column(columnDefinition = "TEXT")
-    private String skills;
-    
     @Column(name = "years_of_experience")
     private Integer yearsOfExperience;
     
@@ -92,9 +89,6 @@ public class User {
     
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-    
-    public String getSkills() { return skills; }
-    public void setSkills(String skills) { this.skills = skills; }
     
     public Integer getYearsOfExperience() { return yearsOfExperience; }
     public void setYearsOfExperience(Integer yearsOfExperience) { this.yearsOfExperience = yearsOfExperience; }

@@ -151,6 +151,37 @@ public class TrainerController {
         }
     }
     
+    @GetMapping("/{empId}")
+    public ResponseEntity<Map<String, Object>> getTrainerProfile(@PathVariable String empId) {
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            User trainer = userService.findByEmpId(empId);
+            
+            if (trainer != null && "trainer".equals(trainer.getRole())) {
+                Map<String, Object> trainerData = new HashMap<>();
+                trainerData.put("name", trainer.getName());
+                trainerData.put("email", trainer.getEmail());
+                trainerData.put("empId", trainer.getEmpId());
+                trainerData.put("phoneNumber", trainer.getPhoneNumber());
+                trainerData.put("yearsOfExperience", trainer.getYearsOfExperience());
+                trainerData.put("address", trainer.getAddress());
+                
+                response.put("success", true);
+                response.put("trainer", trainerData);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "Trainer not found");
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error fetching trainer profile: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
     @PutMapping("/{empId}")
     public ResponseEntity<Map<String, Object>> updateTrainer(@PathVariable String empId, @RequestBody Map<String, Object> updates) {
         Map<String, Object> response = new HashMap<>();
@@ -159,15 +190,52 @@ public class TrainerController {
             User trainer = userService.findByEmpId(empId);
             
             if (trainer != null && "trainer".equals(trainer.getRole())) {
-                if (updates.containsKey("name")) trainer.setName((String) updates.get("name"));
-                if (updates.containsKey("email")) trainer.setEmail((String) updates.get("email"));
-                if (updates.containsKey("phoneNumber")) trainer.setPhoneNumber((String) updates.get("phoneNumber"));
-                if (updates.containsKey("skills")) trainer.setSkills((String) updates.get("skills"));
-                if (updates.containsKey("yearsOfExperience")) {
-                    Object exp = updates.get("yearsOfExperience");
-                    trainer.setYearsOfExperience(exp != null ? Integer.valueOf(exp.toString()) : null);
+                if (updates.containsKey("name")) {
+                    String name = (String) updates.get("name");
+                    if (!name.matches("^[a-zA-Z\\s]*$")) {
+                        response.put("success", false);
+                        response.put("message", "Full name can only contain letters and spaces");
+                        return ResponseEntity.badRequest().body(response);
+                    }
+                    if (name.length() > 20) {
+                        response.put("success", false);
+                        response.put("message", "Full name cannot exceed 20 characters");
+                        return ResponseEntity.badRequest().body(response);
+                    }
+                    trainer.setName(name);
                 }
-                if (updates.containsKey("address")) trainer.setAddress((String) updates.get("address"));
+                
+                if (updates.containsKey("phoneNumber")) {
+                    String phoneNumber = (String) updates.get("phoneNumber");
+                    if (!phoneNumber.matches("^\\d{10}$")) {
+                        response.put("success", false);
+                        response.put("message", "Phone number must be exactly 10 digits");
+                        return ResponseEntity.badRequest().body(response);
+                    }
+                    trainer.setPhoneNumber(phoneNumber);
+                }
+                
+                if (updates.containsKey("yearsOfExperience")) {
+                    try {
+                        Object exp = updates.get("yearsOfExperience");
+                        Integer experience = exp != null ? Integer.valueOf(exp.toString()) : null;
+                        if (experience != null && experience < 2) {
+                            response.put("success", false);
+                            response.put("message", "Years of experience must be 2 or greater");
+                            return ResponseEntity.badRequest().body(response);
+                        }
+                        trainer.setYearsOfExperience(experience);
+                    } catch (NumberFormatException e) {
+                        response.put("success", false);
+                        response.put("message", "Invalid years of experience format");
+                        return ResponseEntity.badRequest().body(response);
+                    }
+                }
+                
+                if (updates.containsKey("address")) {
+                    String address = (String) updates.get("address");
+                    trainer.setAddress(address);
+                }
                 
                 userService.saveUser(trainer);
                 

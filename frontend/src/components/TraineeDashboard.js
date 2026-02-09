@@ -59,6 +59,28 @@ const TraineeDashboard = ({ user, onLogout }) => {
     address: user?.address || ''
   });
 
+  const handleProfileInputChange = (field, value) => {
+    if (field === 'name') {
+      if (!/^[a-zA-Z\s]*$/.test(value)) {
+        alert('Full name can only contain letters and spaces');
+        return;
+      }
+    }
+    
+    if (field === 'phone') {
+      if (!/^\d*$/.test(value)) {
+        alert('Phone number can only contain digits');
+        return;
+      }
+      if (value.length > 10) {
+        alert('Phone number must be exactly 10 digits');
+        return;
+      }
+    }
+    
+    setProfileData({...profileData, [field]: value});
+  };
+
   // Initialize profile data when user data is available
   useEffect(() => {
     if (user) {
@@ -534,12 +556,12 @@ const TraineeDashboard = ({ user, onLogout }) => {
                 <div className="progress-input-container">
                   <input 
                     type="number" 
-                    min="1" 
+                    min="0" 
                     max="99" 
                     value={course.progress || ''}
                     onChange={async (e) => {
                       const value = e.target.value;
-                      const newProgress = value === '' ? 1 : Math.min(99, Math.max(1, parseInt(value) || 1));
+                      const newProgress = value === '' ? 0 : Math.min(99, Math.max(0, parseInt(value) || 0));
                       
                       // Update local state immediately
                       setEnrolledCourses(prev => prev.map(c => 
@@ -569,7 +591,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
                       }
                     }}
                     className="progress-input"
-                    placeholder="1"
+                    placeholder="0"
                     disabled={course.completed || !course.started}
                   />
                   <span className="progress-percent">%</span>
@@ -1169,7 +1191,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
               <input 
                 type="text"
                 value={profileData.name}
-                onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                onChange={(e) => handleProfileInputChange('name', e.target.value)}
                 disabled={!isEditingProfile}
               />
             </div>
@@ -1179,6 +1201,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
                 type="text"
                 value={profileData.empId}
                 disabled
+                style={{ backgroundColor: '#f1f3f4', color: '#666' }}
               />
             </div>
           </div>
@@ -1189,8 +1212,8 @@ const TraineeDashboard = ({ user, onLogout }) => {
               <input 
                 type="email"
                 value={profileData.email}
-                onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                disabled={!isEditingProfile}
+                disabled
+                style={{ backgroundColor: '#f1f3f4', color: '#666' }}
               />
             </div>
             <div className="form-group">
@@ -1198,8 +1221,10 @@ const TraineeDashboard = ({ user, onLogout }) => {
               <input 
                 type="tel"
                 value={profileData.phone}
-                onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                onChange={(e) => handleProfileInputChange('phone', e.target.value)}
                 disabled={!isEditingProfile}
+                placeholder="Enter 10-digit phone number"
+                maxLength={10}
               />
             </div>
           </div>
@@ -1210,8 +1235,8 @@ const TraineeDashboard = ({ user, onLogout }) => {
               <input 
                 type="text"
                 value={profileData.batch}
-                onChange={(e) => setProfileData({...profileData, batch: e.target.value})}
-                disabled={!isEditingProfile}
+                disabled
+                style={{ backgroundColor: '#f1f3f4', color: '#666' }}
               />
             </div>
             <div className="form-group">
@@ -1236,7 +1261,7 @@ const TraineeDashboard = ({ user, onLogout }) => {
           </div>
           
           <div className="form-group">
-            <label>Experience</label>
+            <label>Experience (Optional)</label>
             <textarea 
               value={profileData.experience}
               onChange={(e) => setProfileData({...profileData, experience: e.target.value})}

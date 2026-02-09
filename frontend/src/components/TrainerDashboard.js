@@ -36,10 +36,51 @@ const TrainerDashboard = ({ user, onLogout }) => {
     email: user?.email || '',
     empId: user?.empId || '',
     phoneNumber: user?.phoneNumber || '',
-    skills: user?.skills || '',
     yearsOfExperience: user?.yearsOfExperience || '',
     address: user?.address || ''
   });
+  
+  const handleProfileInputChange = (field, value) => {
+    // Full name validation - only letters, max 20 characters
+    if (field === 'name') {
+      if (!/^[a-zA-Z\s]*$/.test(value)) {
+        alert('Full name can only contain letters and spaces');
+        return;
+      }
+      if (value.length > 20) {
+        alert('Full name cannot exceed 20 characters');
+        return;
+      }
+    }
+    
+    // Phone number validation - only 10 digits
+    if (field === 'phoneNumber') {
+      if (!/^\d*$/.test(value)) {
+        alert('Phone number can only contain digits');
+        return;
+      }
+      if (value.length > 10) {
+        alert('Phone number must be exactly 10 digits');
+        return;
+      }
+    }
+    
+    // Years of experience validation - minimum 2, no negative
+    if (field === 'yearsOfExperience') {
+      const numValue = parseInt(value);
+      if (value !== '' && (isNaN(numValue) || numValue < 2)) {
+        alert('Years of experience must be 2 or greater');
+        return;
+      }
+    }
+    
+    // Address validation - no restrictions
+    if (field === 'address') {
+      // No validation restrictions for address
+    }
+    
+    setProfileData(prev => ({ ...prev, [field]: value }));
+  };
   
   // Modal States
   const [showCourseModal, setShowCourseModal] = useState(false);
@@ -507,6 +548,10 @@ const TrainerDashboard = ({ user, onLogout }) => {
       return;
     }
     
+    if (!window.confirm(`Are you sure you want to add this trainee to ${batchName} batch?`)) {
+      return;
+    }
+    
     try {
       const response = await fetch(`http://localhost:8080/api/trainer/approve-trainee/${traineeId}?batchName=${encodeURIComponent(batchName)}`, {
         method: 'POST'
@@ -556,6 +601,10 @@ const TrainerDashboard = ({ user, onLogout }) => {
   };
 
   const handleRejectTrainee = async (traineeId) => {
+    if (!window.confirm('Are you sure you want to reject this trainee request?')) {
+      return;
+    }
+    
     try {
       const response = await fetch(`http://localhost:8080/api/trainer/reject-trainee/${traineeId}`, {
         method: 'DELETE'
@@ -1769,8 +1818,9 @@ const TrainerDashboard = ({ user, onLogout }) => {
               <input 
                 type="text"
                 value={profileData.name}
-                onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                onChange={(e) => handleProfileInputChange('name', e.target.value)}
                 disabled={!isEditingProfile}
+                maxLength={20}
               />
             </div>
             <div className="form-group">
@@ -1779,6 +1829,7 @@ const TrainerDashboard = ({ user, onLogout }) => {
                 type="text"
                 value={profileData.empId}
                 disabled
+                style={{ backgroundColor: '#f1f3f4', color: '#666' }}
               />
             </div>
           </div>
@@ -1789,8 +1840,8 @@ const TrainerDashboard = ({ user, onLogout }) => {
               <input 
                 type="email"
                 value={profileData.email}
-                onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                disabled={!isEditingProfile}
+                disabled
+                style={{ backgroundColor: '#f1f3f4', color: '#666' }}
               />
             </div>
             <div className="form-group">
@@ -1798,9 +1849,10 @@ const TrainerDashboard = ({ user, onLogout }) => {
               <input 
                 type="tel"
                 value={profileData.phoneNumber}
-                onChange={(e) => setProfileData({...profileData, phoneNumber: e.target.value})}
+                onChange={(e) => handleProfileInputChange('phoneNumber', e.target.value)}
                 disabled={!isEditingProfile}
-                placeholder="Enter phone number"
+                placeholder="Enter 10-digit phone number"
+                maxLength={10}
               />
             </div>
           </div>
@@ -1811,35 +1863,22 @@ const TrainerDashboard = ({ user, onLogout }) => {
               <input 
                 type="number"
                 value={profileData.yearsOfExperience}
-                onChange={(e) => setProfileData({...profileData, yearsOfExperience: e.target.value})}
+                onChange={(e) => handleProfileInputChange('yearsOfExperience', e.target.value)}
                 disabled={!isEditingProfile}
-                placeholder="Enter years of experience"
-                min="0"
-              />
-            </div>
-            <div className="form-group">
-              <label>Skills</label>
-              <textarea 
-                value={profileData.skills}
-                onChange={(e) => setProfileData({...profileData, skills: e.target.value})}
-                disabled={!isEditingProfile}
-                placeholder="Enter your skills (e.g., Java, React, Spring Boot)"
-                rows="3"
+                placeholder="Minimum 2 years"
+                min="2"
               />
             </div>
           </div>
           
-          <div className="form-row">
-            <div className="form-group">
-              <label>Address</label>
-              <textarea 
-                value={profileData.address}
-                onChange={(e) => setProfileData({...profileData, address: e.target.value})}
-                disabled={!isEditingProfile}
-                placeholder="Enter your address"
-                rows="3"
-              />
-            </div>
+          <div className="form-group">
+            <label>Address</label>
+            <textarea 
+              value={profileData.address}
+              onChange={(e) => handleProfileInputChange('address', e.target.value)}
+              disabled={!isEditingProfile}
+              placeholder="Enter your address"
+            />
           </div>
           
           {isEditingProfile && (

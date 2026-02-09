@@ -65,7 +65,6 @@ public class TraineeController {
                 if (updates.containsKey("name")) trainee.setName((String) updates.get("name"));
                 if (updates.containsKey("email")) trainee.setEmail((String) updates.get("email"));
                 if (updates.containsKey("phone")) trainee.setPhoneNumber((String) updates.get("phone"));
-                if (updates.containsKey("skills")) trainee.setSkills((String) updates.get("skills"));
                 if (updates.containsKey("experience")) {
                     Object exp = updates.get("experience");
                     if (exp instanceof String) {
