@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 const Homepage = ({ onLogin, selectedRole: initialRole, onBack }) => {
   const { registerUser, authenticateUser } = useAppContext();
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [selectedRole, setSelectedRole] = useState(initialRole || 'trainer');
   const [showPassword, setShowPassword] = useState(false);
@@ -359,6 +361,18 @@ const Homepage = ({ onLogin, selectedRole: initialRole, onBack }) => {
                   `${isLogin ? 'Login' : 'Sign Up'} as ${selectedRole}`
                 )}
               </button>
+              
+              {isLogin && (
+                <div className="forgot-password-link">
+                  <button 
+                    type="button" 
+                    onClick={() => navigate('/forgot-password')}
+                    className="forgot-link-btn"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
             </form>
           </div>
         </div>
@@ -602,6 +616,25 @@ const Homepage = ({ onLogin, selectedRole: initialRole, onBack }) => {
         
         .password-requirements li {
           margin-bottom: 2px;
+        }
+        
+        .forgot-password-link {
+          text-align: center;
+          margin-top: 15px;
+        }
+        
+        .forgot-link-btn {
+          background: none;
+          border: none;
+          color: #667eea;
+          font-size: 14px;
+          cursor: pointer;
+          text-decoration: underline;
+          transition: all 0.3s;
+        }
+        
+        .forgot-link-btn:hover {
+          color: #764ba2;
         }
       `}</style>
     </div>

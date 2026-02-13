@@ -272,13 +272,13 @@
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  color: black !important;
+  color: rgb(252, 250, 250) !important;
 }
 
 .stat-label {
   font-size: 0.9rem;
   opacity: 0.9;
-  color: black !important;
+  color: rgb(253, 251, 251) !important;
 }
 
 .trainee-analytics-card {

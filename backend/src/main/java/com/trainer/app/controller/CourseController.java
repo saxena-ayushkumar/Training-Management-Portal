@@ -129,7 +129,18 @@ public class CourseController {
             }
             
             String traineeBatch = trainee.getBatchName();
-            List<Course> availableCourses = courseService.getAvailableCoursesForTrainee(traineeBatch);
+            String trainerEmpId = trainee.getTrainerEmpId();
+            
+            // Validate trainer assignment
+            if (trainerEmpId == null || trainerEmpId.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "Trainee is not assigned to any trainer");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Only show courses created by the trainee's trainer
+            List<Course> availableCourses = courseService.getAvailableCoursesForTrainee(traineeBatch, trainerEmpId);
             
             // Get progress for each course
             List<CourseProgress> allProgress = courseProgressRepository.findByTraineeEmpId(traineeEmpId);

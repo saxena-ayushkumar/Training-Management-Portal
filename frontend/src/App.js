@@ -5,6 +5,7 @@ import LandingPage from './components/LandingPage';
 import Homepage from './components/Homepage';
 import TrainerDashboard from './components/TrainerDashboard';
 import TraineeDashboard from './components/TraineeDashboard';
+import ForgotPassword from './components/ForgotPassword';
 import './App.css';
 
 function App() {
@@ -66,6 +67,10 @@ function App() {
                 <TraineeDashboard user={user} onLogout={logout} /> : 
                 <Navigate to="/" />
               } 
+            />
+            <Route 
+              path="/forgot-password" 
+              element={<ForgotPassword />} 
             />
           </Routes>
         </div>

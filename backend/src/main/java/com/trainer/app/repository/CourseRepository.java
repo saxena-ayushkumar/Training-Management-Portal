@@ -13,11 +13,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     
     List<Course> findByTrainerEmpId(String trainerEmpId);
     
-    @Query("SELECT c FROM Course c WHERE c.assignedBatch IS NULL OR c.assignedBatch = :batchName")
-    List<Course> findAvailableCoursesForBatch(@Param("batchName") String batchName);
+    @Query("SELECT c FROM Course c WHERE c.trainerEmpId = :trainerEmpId AND (c.assignedBatch IS NULL OR c.assignedBatch = :batchName)")
+    List<Course> findAvailableCoursesForBatchAndTrainer(@Param("batchName") String batchName, @Param("trainerEmpId") String trainerEmpId);
     
-    @Query("SELECT c FROM Course c WHERE c.status = 'active' AND (c.assignedBatch IS NULL OR c.assignedBatch = :batchName)")
-    List<Course> findActiveCoursesForBatch(@Param("batchName") String batchName);
+    @Query("SELECT c FROM Course c WHERE c.status = 'active' AND c.trainerEmpId = :trainerEmpId AND (c.assignedBatch IS NULL OR c.assignedBatch = :batchName)")
+    List<Course> findActiveCoursesForBatchAndTrainer(@Param("batchName") String batchName, @Param("trainerEmpId") String trainerEmpId);
     
     List<Course> findByStatus(String status);
 }

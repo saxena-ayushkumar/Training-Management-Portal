@@ -37,12 +37,12 @@ public class CourseService {
         return courseRepository.findByTrainerEmpId(trainerEmpId);
     }
     
-    public List<Course> getAvailableCoursesForTrainee(String traineeBatch) {
+    public List<Course> getAvailableCoursesForTrainee(String traineeBatch, String trainerEmpId) {
         if (traineeBatch == null || traineeBatch.isEmpty()) {
-            // If trainee has no batch, show only courses with no batch restriction
-            return courseRepository.findAvailableCoursesForBatch(null);
+            // If trainee has no batch, show only courses from their trainer with no batch restriction
+            return courseRepository.findAvailableCoursesForBatchAndTrainer(null, trainerEmpId);
         }
-        return courseRepository.findActiveCoursesForBatch(traineeBatch);
+        return courseRepository.findActiveCoursesForBatchAndTrainer(traineeBatch, trainerEmpId);
     }
     
     public Optional<Course> getCourseById(Long courseId) {

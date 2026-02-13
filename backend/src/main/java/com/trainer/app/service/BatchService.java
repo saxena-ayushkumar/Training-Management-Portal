@@ -25,7 +25,8 @@ public class BatchService {
         List<Batch> batches = batchRepository.findByTrainerEmpId(trainerEmpId);
         
         return batches.stream().map(batch -> {
-            int traineeCount = userRepository.countByBatchNameAndStatus(batch.getName(), "approved");
+            // Count only trainees under this specific trainer
+            int traineeCount = userRepository.countByBatchNameAndStatusAndTrainer(batch.getName(), "approved", trainerEmpId);
             return new BatchWithTraineesDto(batch.getId(), batch.getName(), batch.getDescription(), traineeCount);
         }).collect(Collectors.toList());
     }
