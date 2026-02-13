@@ -1,15 +1,14 @@
 package com.trainer.app.controller;
 
+import com.trainer.app.dto.TraineeUpdateDto;
 import com.trainer.app.model.User;
-import com.trainer.app.repository.UserRepository;
-import com.trainer.app.service.UserService;
+import com.trainer.app.service.TraineeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/trainees")
@@ -17,21 +16,12 @@ import java.util.Optional;
 public class TraineeController {
 
     @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private UserService userService;
+    private TraineeService traineeService;
 
     @GetMapping("/{empId}")
     public ResponseEntity<?> getTraineeByEmpId(@PathVariable String empId) {
         try {
-            User trainee = userService.findByEmpId(empId);
-            if (trainee == null || !"trainee".equals(trainee.getRole())) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", false);
-                response.put("message", "Trainee not found");
-                return ResponseEntity.badRequest().body(response);
-            }
+            User trainee = traineeService.getTraineeByEmpId(empId);
             
             Map<String, Object> traineeData = new HashMap<>();
             traineeData.put("id", trainee.getId());
@@ -55,12 +45,17 @@ public class TraineeController {
     }
 
     @PutMapping("/{empId}")
-    public ResponseEntity<Map<String, Object>> updateTrainee(@PathVariable String empId, @RequestBody Map<String, Object> updates) {
+    public ResponseEntity<Map<String, Object>> updateTrainee(@PathVariable String empId, @RequestBody TraineeUpdateDto updateDto) {
         Map<String, Object> response = new HashMap<>();
         
         try {
-            User trainee = userService.findByEmpId(empId);
+            User updatedTrainee = traineeService.updateTrainee(empId, updateDto);
             
+<<<<<<< HEAD
+            response.put("success", true);
+            response.put("message", "Trainee profile updated successfully");
+            return ResponseEntity.ok(response);
+=======
             if (trainee != null && "trainee".equals(trainee.getRole())) {
                 if (updates.containsKey("name")) trainee.setName((String) updates.get("name"));
                 if (updates.containsKey("email")) trainee.setEmail((String) updates.get("email"));
@@ -83,6 +78,7 @@ public class TraineeController {
                 response.put("message", "Trainee not found");
                 return ResponseEntity.notFound().build();
             }
+>>>>>>> TMP
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Error updating trainee profile: " + e.getMessage());

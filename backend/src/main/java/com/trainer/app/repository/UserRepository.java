@@ -31,4 +31,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     @Query("SELECT u FROM User u WHERE u.role = 'trainer' AND u.empId = ?1")
     Optional<User> findTrainerByEmpId(String empId);
+    
+    @Query("SELECT COUNT(u) FROM User u WHERE u.batchName = ?1 AND u.role = ?2 AND u.status = ?3")
+    int countByBatchNameAndRoleAndStatus(String batchName, String role, String status);
+    
+    @Query("SELECT COUNT(u) FROM User u WHERE u.batchName = ?1 AND u.role = ?2 AND u.status = ?3 AND u.trainerEmpId = ?4")
+    int countByBatchNameAndRoleAndStatusAndTrainer(String batchName, String role, String status, String trainerEmpId);
 }

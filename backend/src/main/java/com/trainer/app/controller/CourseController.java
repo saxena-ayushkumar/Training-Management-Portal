@@ -1,22 +1,22 @@
 package com.trainer.app.controller;
 
+import com.trainer.app.dto.CourseCreateDto;
+import com.trainer.app.dto.CourseResponseDto;
+import com.trainer.app.dto.CourseProgressDto;
+import com.trainer.app.dto.CertificateResponseDto;
 import com.trainer.app.model.Course;
 import com.trainer.app.model.CourseProgress;
-import com.trainer.app.model.CourseEnrollment;
-import com.trainer.app.repository.CourseProgressRepository;
-import com.trainer.app.repository.CourseEnrollmentRepository;
-import com.trainer.app.repository.CourseFeedbackRepository;
-import com.trainer.app.repository.CourseCertificateRepository;
 import com.trainer.app.model.CourseCertificate;
+import com.trainer.app.model.CourseFeedback;
 import com.trainer.app.service.CourseService;
 import com.trainer.app.service.UserService;
+import com.trainer.app.service.CourseFeedbackService;
+import com.trainer.app.service.CertificateService;
 import com.trainer.app.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,24 +34,15 @@ public class CourseController {
     private UserService userService;
     
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private CourseFeedbackService feedbackService;
     
     @Autowired
-    private CourseProgressRepository courseProgressRepository;
-    
-    @Autowired
-    private CourseEnrollmentRepository courseEnrollmentRepository;
-    
-    @Autowired
-    private CourseFeedbackRepository courseFeedbackRepository;
-    
-    @Autowired
-    private CourseCertificateRepository courseCertificateRepository;
+    private CertificateService certificateService;
     
     @PostMapping
-    public ResponseEntity<?> createCourse(@RequestBody Course course) {
+    public ResponseEntity<?> createCourse(@RequestBody CourseCreateDto courseDto) {
         try {
-            Course createdCourse = courseService.createCourse(course);
+            CourseResponseDto createdCourse = courseService.createCourse(courseDto);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Course created successfully");
@@ -66,9 +57,9 @@ public class CourseController {
     }
     
     @PutMapping("/{courseId}")
-    public ResponseEntity<?> updateCourse(@PathVariable Long courseId, @RequestBody Course course) {
+    public ResponseEntity<?> updateCourse(@PathVariable Long courseId, @RequestBody CourseCreateDto courseDto) {
         try {
-            Course updatedCourse = courseService.updateCourse(courseId, course);
+            CourseResponseDto updatedCourse = courseService.updateCourse(courseId, courseDto);
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Course updated successfully");
@@ -85,29 +76,8 @@ public class CourseController {
     @GetMapping("/trainer/{trainerEmpId}")
     public ResponseEntity<?> getCoursesByTrainer(@PathVariable String trainerEmpId) {
         try {
-            List<Course> courses = courseService.getCoursesByTrainer(trainerEmpId);
-            
-            // Add real enrollment count for each course
-            List<Map<String, Object>> coursesWithStats = courses.stream().map(course -> {
-                Map<String, Object> courseData = new HashMap<>();
-                courseData.put("id", course.getId());
-                courseData.put("title", course.getTitle());
-                courseData.put("description", course.getDescription());
-                courseData.put("duration", course.getDuration());
-                courseData.put("status", course.getStatus());
-                courseData.put("instructor", course.getInstructor());
-                courseData.put("courseLink", course.getCourseLink());
-                courseData.put("assignedBatch", course.getAssignedBatch());
-                courseData.put("trainerEmpId", course.getTrainerEmpId());
-                
-                // Get real enrollment count from progress table
-                int enrolledCount = courseProgressRepository.findByCourseId(course.getId()).size();
-                courseData.put("enrolledCount", enrolledCount);
-                
-                return courseData;
-            }).toList();
-            
-            return ResponseEntity.ok(coursesWithStats);
+            List<CourseResponseDto> courses = courseService.getCoursesByTrainerDto(trainerEmpId);
+            return ResponseEntity.ok(courses);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
@@ -129,6 +99,9 @@ public class CourseController {
             }
             
             String traineeBatch = trainee.getBatchName();
+<<<<<<< HEAD
+            List<CourseResponseDto> coursesWithProgress = courseService.getAvailableCoursesForTraineeDto(traineeEmpId, traineeBatch);
+=======
             String trainerEmpId = trainee.getTrainerEmpId();
             
             // Validate trainer assignment
@@ -177,6 +150,7 @@ public class CourseController {
                 
                 return courseData;
             }).toList();
+>>>>>>> TMP
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -194,15 +168,8 @@ public class CourseController {
     @GetMapping("/{courseId}")
     public ResponseEntity<?> getCourseById(@PathVariable Long courseId) {
         try {
-            Optional<Course> course = courseService.getCourseById(courseId);
-            if (course.isPresent()) {
-                return ResponseEntity.ok(course.get());
-            } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", false);
-                response.put("message", "Course not found");
-                return ResponseEntity.badRequest().body(response);
-            }
+            CourseResponseDto course = courseService.getCourseByIdDto(courseId);
+            return ResponseEntity.ok(course);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
@@ -230,16 +197,10 @@ public class CourseController {
     @GetMapping("/{courseId}/analytics")
     public ResponseEntity<?> getCourseAnalytics(@PathVariable Long courseId, @RequestParam String trainerEmpId) {
         try {
-            // Verify trainer owns this course
-            Optional<Course> courseOpt = courseService.getCourseById(courseId);
-            if (!courseOpt.isPresent()) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", false);
-                response.put("message", "Course not found");
-                return ResponseEntity.badRequest().body(response);
-            }
+            // Get course details first
+            CourseResponseDto course = courseService.getCourseByIdDto(courseId);
             
-            Course course = courseOpt.get();
+            // Verify trainer owns this course
             if (!course.getTrainerEmpId().equals(trainerEmpId)) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", false);
@@ -247,171 +208,125 @@ public class CourseController {
                 return ResponseEntity.badRequest().body(response);
             }
             
-            try {
-                // Get real data from database
-                List<Map<String, Object>> enrollments = courseProgressRepository.findByCourseId(courseId)
-                    .stream()
-                    .map(progress -> {
-                        Map<String, Object> enrollment = new HashMap<>();
-                        enrollment.put("id", progress.getId());
-                        enrollment.put("traineeEmpId", progress.getTraineeEmpId());
-                        
-                        // Determine status based on progress data
-                        String status;
-                        if (progress.getCompleted()) {
-                            status = "completed";
-                        } else if (progress.getStarted()) {
-                            status = "in-progress";
-                        } else {
-                            status = "not-started";
-                        }
-                        
-                        enrollment.put("status", status);
-                        enrollment.put("progressPercentage", progress.getProgressPercentage());
-                        enrollment.put("enrolledAt", progress.getStartedAt());
-                        enrollment.put("completedAt", progress.getCompletedAt());
-                        
-                        // Get trainee name
-                        try {
-                            User trainee = userService.findByEmpId(progress.getTraineeEmpId());
-                            enrollment.put("traineeName", trainee != null ? trainee.getName() : "Unknown");
-                        } catch (Exception e) {
-                            enrollment.put("traineeName", "Unknown");
-                        }
-                        
-                        // Check for certificate
-                        Optional<CourseCertificate> certificate = courseCertificateRepository
-                            .findByTraineeEmpIdAndCourseId(progress.getTraineeEmpId(), courseId);
-                        enrollment.put("hasCertificate", certificate.isPresent());
-                        if (certificate.isPresent()) {
-                            enrollment.put("certificateId", certificate.get().getId());
-                            enrollment.put("certificateFileName", certificate.get().getFileName());
-                            enrollment.put("certificateUploadedAt", certificate.get().getUploadedAt());
-                        }
-                        
-                        return enrollment;
-                    })
-                    .toList();
-                
-                List<Map<String, Object>> feedback = courseFeedbackRepository.findByCourseId(courseId)
-                    .stream()
-                    .map(fb -> {
-                        Map<String, Object> feedbackData = new HashMap<>();
-                        feedbackData.put("id", fb.getId());
-                        feedbackData.put("traineeEmpId", fb.getTraineeEmpId());
-                        feedbackData.put("traineeName", fb.getTraineeName());
-                        feedbackData.put("rating", fb.getRating());
-                        feedbackData.put("keyLearnings", fb.getKeyLearnings());
-                        feedbackData.put("feedback", fb.getFeedback());
-                        feedbackData.put("submittedAt", fb.getSubmittedAt());
-                        return feedbackData;
-                    })
-                    .toList();
-                
-                // Calculate comprehensive statistics
-                Long totalEnrollments = (long) enrollments.size();
-                Long completedCount = enrollments.stream()
-                    .mapToLong(e -> "completed".equals(e.get("status")) ? 1 : 0)
-                    .sum();
-                Long inProgressCount = enrollments.stream()
-                    .mapToLong(e -> "in-progress".equals(e.get("status")) ? 1 : 0)
-                    .sum();
-                Long notStartedCount = enrollments.stream()
-                    .mapToLong(e -> "not-started".equals(e.get("status")) ? 1 : 0)
-                    .sum();
-                
-                // Calculate average rating from feedback
-                Double averageRating = feedback.isEmpty() ? 0.0 : 
-                    feedback.stream()
-                        .mapToInt(f -> (Integer) f.get("rating"))
-                        .average()
-                        .orElse(0.0);
-                
-                Long feedbackCount = (long) feedback.size();
-                
-                // Calculate completion percentage as average of all trainee progress percentages
-                Double completionPercentage = totalEnrollments > 0 ? 
-                    enrollments.stream()
-                        .mapToInt(e -> (Integer) e.get("progressPercentage"))
-                        .average()
-                        .orElse(0.0) : 0.0;
-                
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", true);
-                response.put("course", course);
-                response.put("enrollments", enrollments);
-                response.put("feedback", feedback);
-                response.put("statistics", Map.of(
-                    "totalEnrollments", totalEnrollments,
-                    "completedCount", completedCount,
-                    "inProgressCount", inProgressCount,
-                    "notStartedCount", notStartedCount,
-                    "averageRating", Math.round(averageRating * 10.0) / 10.0, // Round to 1 decimal
-                    "feedbackCount", feedbackCount,
-                    "completionPercentage", Math.round(completionPercentage * 10.0) / 10.0
-                ));
-                
-                return ResponseEntity.ok(response);
-                
-            } catch (Exception e) {
-                // Fallback to mock data if analytics tables don't exist
-                System.out.println("Analytics tables not found, using mock data: " + e.getMessage());
-                
-                List<Map<String, Object>> mockEnrollments = List.of(
-                    Map.of(
-                        "id", 1,
-                        "traineeEmpId", "EMP001",
-                        "traineeName", "Alice Brown",
-                        "status", "completed",
-                        "enrolledAt", "2024-01-01T10:00:00",
-                        "completedAt", "2024-01-15T16:30:00",
-                        "progressPercentage", 100
-                    ),
-                    Map.of(
-                        "id", 2,
-                        "traineeEmpId", "EMP002",
-                        "traineeName", "Bob Wilson",
-                        "status", "in-progress",
-                        "enrolledAt", "2024-01-02T09:15:00",
-                        "progressPercentage", 65
-                    ),
-                    Map.of(
-                        "id", 3,
-                        "traineeEmpId", "EMP003",
-                        "traineeName", "Carol Davis",
-                        "status", "not-started",
-                        "enrolledAt", "2024-01-03T14:20:00",
-                        "progressPercentage", 0
-                    )
-                );
-                
-                List<Map<String, Object>> mockFeedback = List.of(
-                    Map.of(
-                        "traineeEmpId", "EMP001",
-                        "traineeName", "Alice Brown",
-                        "rating", 5,
-                        "keyLearnings", "Learned React components, state management, and hooks.",
-                        "feedback", "Excellent course content and delivery.",
-                        "submittedAt", "2024-01-15T17:00:00"
-                    )
-                );
-                
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", true);
-                response.put("course", course);
-                response.put("enrollments", mockEnrollments);
-                response.put("feedback", mockFeedback);
-                response.put("statistics", Map.of(
-                    "totalEnrollments", 3,
-                    "completedCount", 1,
-                    "inProgressCount", 1,
-                    "notStartedCount", 1,
-                    "averageRating", 4.5,
-                    "feedbackCount", 1
-                ));
-                
-                return ResponseEntity.ok(response);
-            }
+            // Get real progress data
+            List<CourseProgress> progressList = courseService.getCourseProgress(courseId);
+            
+            // Get certificates for this course
+            List<CertificateResponseDto> certificates = certificateService.getCertificatesByCourse(courseId, trainerEmpId);
+            
+            // Get feedback for this course
+            List<CourseFeedback> feedbackList = feedbackService.getFeedbackByCourse(courseId);
+            
+            List<Map<String, Object>> feedback = feedbackList.stream()
+                .map(fb -> {
+                    Map<String, Object> feedbackData = new HashMap<>();
+                    feedbackData.put("id", fb.getId());
+                    feedbackData.put("traineeEmpId", fb.getTraineeEmpId());
+                    feedbackData.put("traineeName", fb.getTraineeName());
+                    feedbackData.put("rating", fb.getRating());
+                    feedbackData.put("keyLearnings", fb.getKeyLearnings());
+                    feedbackData.put("feedback", fb.getFeedback());
+                    feedbackData.put("submittedAt", fb.getSubmittedAt());
+                    return feedbackData;
+                })
+                .toList();
+            
+            List<Map<String, Object>> enrollments = progressList.stream()
+                .map(progress -> {
+                    Map<String, Object> enrollment = new HashMap<>();
+                    enrollment.put("id", progress.getId());
+                    enrollment.put("traineeEmpId", progress.getTraineeEmpId());
+                    
+                    // Determine status based on progress data
+                    String status;
+                    if (progress.getCompleted() != null && progress.getCompleted()) {
+                        status = "completed";
+                    } else if (progress.getStarted() != null && progress.getStarted()) {
+                        status = "in-progress";
+                    } else {
+                        status = "not-started";
+                    }
+                    
+                    enrollment.put("status", status);
+                    enrollment.put("progressPercentage", progress.getProgressPercentage() != null ? progress.getProgressPercentage() : 0);
+                    enrollment.put("enrolledAt", progress.getStartedAt());
+                    enrollment.put("completedAt", progress.getCompletedAt());
+                    
+                    // Get trainee name
+                    try {
+                        User trainee = userService.findByEmpId(progress.getTraineeEmpId());
+                        enrollment.put("traineeName", trainee != null ? trainee.getName() : "Unknown");
+                    } catch (Exception e) {
+                        enrollment.put("traineeName", "Unknown");
+                    }
+                    
+                    // Check for certificate
+                    CertificateResponseDto traineCert = certificates.stream()
+                        .filter(cert -> cert.getTraineeEmpId().equals(progress.getTraineeEmpId()))
+                        .findFirst()
+                        .orElse(null);
+                    
+                    enrollment.put("hasCertificate", traineCert != null);
+                    if (traineCert != null) {
+                        enrollment.put("certificateId", traineCert.getId());
+                        enrollment.put("certificateFileName", traineCert.getFileName());
+                        enrollment.put("certificateUploadedAt", traineCert.getUploadedAt());
+                    }
+                    
+                    return enrollment;
+                })
+                .toList();
+            
+            // Calculate statistics
+            long totalEnrollments = enrollments.size();
+            long completedCount = enrollments.stream()
+                .mapToLong(e -> "completed".equals(e.get("status")) ? 1 : 0)
+                .sum();
+            long inProgressCount = enrollments.stream()
+                .mapToLong(e -> "in-progress".equals(e.get("status")) ? 1 : 0)
+                .sum();
+            long notStartedCount = enrollments.stream()
+                .mapToLong(e -> "not-started".equals(e.get("status")) ? 1 : 0)
+                .sum();
+            
+            // Calculate average rating from feedback
+            double averageRating = feedback.isEmpty() ? 0.0 : 
+                feedback.stream()
+                    .mapToInt(f -> (Integer) f.get("rating"))
+                    .average()
+                    .orElse(0.0);
+            
+            double completionPercentage = totalEnrollments > 0 ? 
+                enrollments.stream()
+                    .mapToInt(e -> (Integer) e.get("progressPercentage"))
+                    .average()
+                    .orElse(0.0) : 0.0;
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("course", Map.of(
+                "id", course.getId(),
+                "title", course.getTitle(),
+                "description", course.getDescription(),
+                "duration", course.getDuration(),
+                "status", course.getStatus(),
+                "instructor", course.getInstructor(),
+                "trainerEmpId", course.getTrainerEmpId()
+            ));
+            response.put("enrollments", enrollments);
+            response.put("feedback", feedback); // Real feedback data
+            response.put("statistics", Map.of(
+                "totalEnrollments", totalEnrollments,
+                "completedCount", completedCount,
+                "inProgressCount", inProgressCount,
+                "notStartedCount", notStartedCount,
+                "averageRating", Math.round(averageRating * 10.0) / 10.0,
+                "feedbackCount", (long) feedback.size(),
+                "completionPercentage", Math.round(completionPercentage * 10.0) / 10.0
+            ));
+            
+            return ResponseEntity.ok(response);
+            
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
@@ -421,47 +336,9 @@ public class CourseController {
     }
     
     @PostMapping("/progress/start")
-    public ResponseEntity<?> startCourse(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> startCourse(@RequestBody CourseProgressDto progressDto) {
         try {
-            Long courseId = Long.valueOf(request.get("courseId").toString());
-            String traineeEmpId = request.get("traineeEmpId").toString();
-            
-            // Get trainee details
-            User trainee = userService.findByEmpId(traineeEmpId);
-            if (trainee == null) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", false);
-                response.put("message", "Trainee not found");
-                return ResponseEntity.badRequest().body(response);
-            }
-            
-            // Create or update course enrollment
-            Optional<CourseEnrollment> existingEnrollment = courseEnrollmentRepository.findByCourseIdAndTraineeEmpId(courseId, traineeEmpId);
-            CourseEnrollment enrollment;
-            
-            if (existingEnrollment.isPresent()) {
-                enrollment = existingEnrollment.get();
-            } else {
-                enrollment = new CourseEnrollment(courseId, traineeEmpId, trainee.getName());
-            }
-            
-            enrollment.setStatus("in-progress");
-            courseEnrollmentRepository.save(enrollment);
-            
-            // Create or update course progress
-            Optional<CourseProgress> existingProgress = courseProgressRepository.findByCourseIdAndTraineeEmpId(courseId, traineeEmpId);
-            CourseProgress progress;
-            
-            if (existingProgress.isPresent()) {
-                progress = existingProgress.get();
-            } else {
-                progress = new CourseProgress(courseId, traineeEmpId);
-            }
-            
-            progress.setStarted(true);
-            progress.setStartedAt(LocalDateTime.now());
-            progress.setUpdatedAt(LocalDateTime.now());
-            courseProgressRepository.save(progress);
+            courseService.startCourse(progressDto.getCourseId(), progressDto.getTraineeEmpId());
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -479,7 +356,7 @@ public class CourseController {
     @GetMapping("/progress/{courseId}")
     public ResponseEntity<?> getCourseProgress(@PathVariable Long courseId) {
         try {
-            List<CourseProgress> progressList = courseProgressRepository.findByCourseId(courseId);
+            List<CourseProgress> progressList = courseService.getCourseProgress(courseId);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -495,33 +372,9 @@ public class CourseController {
     }
     
     @PostMapping("/progress/update")
-    public ResponseEntity<?> updateCourseProgress(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> updateCourseProgress(@RequestBody CourseProgressDto progressDto) {
         try {
-            Long courseId = Long.valueOf(request.get("courseId").toString());
-            String traineeEmpId = request.get("traineeEmpId").toString();
-            Integer progressPercentage = Integer.valueOf(request.get("progressPercentage").toString());
-            
-            Optional<CourseProgress> existingProgress = courseProgressRepository.findByCourseIdAndTraineeEmpId(courseId, traineeEmpId);
-            CourseProgress progress;
-            
-            if (existingProgress.isPresent()) {
-                progress = existingProgress.get();
-            } else {
-                progress = new CourseProgress(courseId, traineeEmpId);
-                progress.setStarted(true);
-                progress.setStartedAt(LocalDateTime.now());
-            }
-            
-            progress.setProgressPercentage(progressPercentage);
-            progress.setUpdatedAt(LocalDateTime.now());
-            
-            // Auto-complete if 100%
-            if (progressPercentage >= 100) {
-                progress.setCompleted(true);
-                progress.setCompletedAt(LocalDateTime.now());
-            }
-            
-            courseProgressRepository.save(progress);
+            courseService.updateCourseProgress(progressDto);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -537,25 +390,9 @@ public class CourseController {
     }
     
     @PostMapping("/progress/complete")
-    public ResponseEntity<?> completeCourse(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> completeCourse(@RequestBody CourseProgressDto progressDto) {
         try {
-            Long courseId = Long.valueOf(request.get("courseId").toString());
-            String traineeEmpId = request.get("traineeEmpId").toString();
-            
-            Optional<CourseProgress> existingProgress = courseProgressRepository.findByCourseIdAndTraineeEmpId(courseId, traineeEmpId);
-            CourseProgress progress;
-            
-            if (existingProgress.isPresent()) {
-                progress = existingProgress.get();
-            } else {
-                progress = new CourseProgress(courseId, traineeEmpId);
-            }
-            
-            progress.setCompleted(true);
-            progress.setProgressPercentage(100);
-            progress.setCompletedAt(LocalDateTime.now());
-            progress.setUpdatedAt(LocalDateTime.now());
-            courseProgressRepository.save(progress);
+            courseService.completeCourse(progressDto.getCourseId(), progressDto.getTraineeEmpId());
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

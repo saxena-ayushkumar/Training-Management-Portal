@@ -186,4 +186,12 @@ public class UserService {
     public User saveUser(User user) {
         return userRepository.save(user);
     }
+    
+    public int getTraineeCountByBatch(String batchName) {
+        return userRepository.countByBatchNameAndRoleAndStatus(batchName, "trainee", "approved");
+    }
+    
+    public int getTraineeCountByBatchAndTrainer(String batchName, String trainerEmpId) {
+        return userRepository.countByBatchNameAndRoleAndStatusAndTrainer(batchName, "trainee", "approved", trainerEmpId);
+    }
 }

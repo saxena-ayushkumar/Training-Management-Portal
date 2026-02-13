@@ -3,7 +3,9 @@ package com.trainer.app.controller;
 import com.trainer.app.dto.BatchWithTraineesDto;
 import com.trainer.app.dto.TraineeDetailsDto;
 import com.trainer.app.repository.CourseRepository;
+import com.trainer.app.repository.CourseProgressRepository;
 import com.trainer.app.model.User;
+import com.trainer.app.model.CourseProgress;
 import com.trainer.app.repository.CourseEnrollmentRepository;
 import com.trainer.app.service.BatchService;
 import com.trainer.app.service.UserService;
@@ -31,6 +33,9 @@ public class TrainerController {
     
     @Autowired
     private CourseEnrollmentRepository courseEnrollmentRepository;
+    
+    @Autowired
+    private CourseProgressRepository courseProgressRepository;
 
     @GetMapping("/pending-trainees")
     public ResponseEntity<?> getPendingTrainees(@RequestParam String trainerEmpId) {
@@ -83,8 +88,15 @@ public class TrainerController {
                     .toList();
                 
                 Long enrolledCount = (long) activeEnrollments.size();
+                
+                // Get completion count from CourseProgress table
                 Long completedCount = activeEnrollments.stream()
-                    .mapToLong(enrollment -> "completed".equals(enrollment.getStatus()) ? 1 : 0)
+                    .mapToLong(enrollment -> {
+                        CourseProgress progress = courseProgressRepository
+                            .findByCourseIdAndTraineeEmpId(enrollment.getCourseId(), trainee.getEmpId())
+                            .orElse(null);
+                        return (progress != null && progress.getCompleted() != null && progress.getCompleted()) ? 1 : 0;
+                    })
                     .sum();
                 
                 traineeData.put("enrolledCoursesCount", enrolledCount.intValue());

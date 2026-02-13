@@ -157,10 +157,31 @@ public class AssessmentController {
     @GetMapping("/{assessmentId}/submissions")
     public ResponseEntity<?> getAssessmentSubmissions(@PathVariable Long assessmentId) {
         try {
+            // Get the assessment to find the batch
+            Optional<Assessment> assessmentOpt = assessmentRepository.findById(assessmentId);
+            if (assessmentOpt.isEmpty()) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", false);
+                response.put("message", "Assessment not found");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            Assessment assessment = assessmentOpt.get();
             List<AssessmentSubmission> submissions = submissionRepository.findByAssessmentId(assessmentId);
+            
+            // Get total trainees in the batch for this trainer
+            int totalTraineesInBatch = userService.getTraineeCountByBatchAndTrainer(assessment.getBatchName(), assessment.getTrainerEmpId());
+            int submittedCount = submissions.size();
+            int pendingCount = totalTraineesInBatch - submittedCount;
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("submissions", submissions);
+            response.put("stats", Map.of(
+                "total", totalTraineesInBatch,
+                "submitted", submittedCount,
+                "pending", pendingCount
+            ));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();

@@ -682,12 +682,12 @@ const TraineeDashboard = ({ user, onLogout }) => {
             >
               Submitted
             </button>
-            <button 
+            {/* <button 
               className={`filter-btn ${assignmentFilter === 'graded' ? 'active' : ''}`}
               onClick={() => setAssignmentFilter('graded')}
             >
               Graded
-            </button>
+            </button> */}
           </div>
         </div>
         
