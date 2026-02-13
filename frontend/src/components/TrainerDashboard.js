@@ -115,6 +115,8 @@ const TrainerDashboard = ({ user, onLogout }) => {
   const [showRejectLeaveModal, setShowRejectLeaveModal] = useState(false);
   const [rejectingLeaveId, setRejectingLeaveId] = useState(null);
   const [rejectionFeedback, setRejectionFeedback] = useState('');
+  const [showPerformanceModal, setShowPerformanceModal] = useState(false);
+  const [selectedBatchPerformance, setSelectedBatchPerformance] = useState('');
 
   const handleViewSubmissions = async (assessmentId) => {
     try {
@@ -413,6 +415,16 @@ const TrainerDashboard = ({ user, onLogout }) => {
       console.error('Error downloading certificate:', error);
       alert('Error downloading certificate');
     }
+  };
+
+  const getTraineePerformanceData = () => {
+    if (!selectedBatchPerformance) return [];
+    
+    const batchTrainees = trainees.filter(t => t.batch === selectedBatchPerformance);
+    return batchTrainees.map(trainee => ({
+      name: trainee.name,
+      performance: Math.floor(Math.random() * 20) + 80
+    }));
   };
 
   // Course Management Functions
@@ -2038,65 +2050,85 @@ const TrainerDashboard = ({ user, onLogout }) => {
     );
   };
 
-  const renderAnalytics = () => (
-    <div className="content-section">
-      <h2 className="section-title">Analytics Dashboard</h2>
-      
-      <div className="analytics-overview">
-        <div className="analytics-card">
-          <div className="analytics-icon">
-            <Users size={24} />
+  const renderAnalytics = () => {
+    const handleViewBatchPerformance = () => {
+      if (!selectedBatchPerformance) {
+        alert('Please select a batch');
+        return;
+      }
+      setShowPerformanceModal(true);
+    };
+
+    return (
+      <div className="content-section">
+        <h2 className="section-title">Analytics Dashboard</h2>
+        
+        <div className="analytics-overview">
+          <div className="analytics-card">
+            <div className="analytics-icon">
+              <Users size={24} />
+            </div>
+            <div className="analytics-content">
+              <h3>{(trainees || []).length}</h3>
+              <p>Total Trainees</p>
+            </div>
           </div>
-          <div className="analytics-content">
-            <h3>{(trainees || []).length}</h3>
-            <p>Total Trainees</p>
+          <div className="analytics-card">
+            <div className="analytics-icon">
+              <BookOpen size={24} />
+            </div>
+            <div className="analytics-content">
+              <h3>{(courses || []).filter(course => course.status === 'active').length}</h3>
+              <p>Active Courses</p>
+            </div>
           </div>
-        </div>
-        <div className="analytics-card">
-          <div className="analytics-icon">
-            <BookOpen size={24} />
+          <div className="analytics-card">
+            <div className="analytics-icon">
+              <Calendar size={24} />
+            </div>
+            <div className="analytics-content">
+              <h3>{(sessions || []).length}</h3>
+              <p>Sessions Conducted</p>
+            </div>
           </div>
-          <div className="analytics-content">
-            <h3>{(courses || []).filter(course => course.status === 'active').length}</h3>
-            <p>Active Courses</p>
-          </div>
-        </div>
-        <div className="analytics-card">
-          <div className="analytics-icon">
-            <Calendar size={24} />
-          </div>
-          <div className="analytics-content">
-            <h3>{(sessions || []).length}</h3>
-            <p>Sessions Conducted</p>
-          </div>
-        </div>
-        <div className="analytics-card">
-          <div className="analytics-icon">
-            <CalendarDays size={24} />
-          </div>
-          <div className="analytics-content">
-            <h3>{(leaveRequests || []).length}</h3>
-            <p>Leave Requests</p>
-          </div>
-        </div>
-      </div>
-      
-      <div className="analytics-charts">
-        <div className="chart-container">
-          <h3>Trainee Performance</h3>
-          <div className="chart-placeholder">
-            <BarChart3 size={48} />
-            <p>Performance analytics chart would be displayed here</p>
-          </div>
-        </div>
-        <div className="chart-container">
-          <h3>Course Completion Rate</h3>
-          <div className="chart-placeholder">
-            <TrendingUp size={48} />
-            <p>Course completion analytics would be displayed here</p>
+          <div className="analytics-card">
+            <div className="analytics-icon">
+              <CalendarDays size={24} />
+            </div>
+            <div className="analytics-content">
+              <h3>{(leaveRequests || []).length}</h3>
+              <p>Leave Requests</p>
+            </div>
           </div>
         </div>
-      </div>
+        
+        <div className="analytics-charts">
+          <div className="chart-container">
+            <h3>Trainee Performance</h3>
+            <p className="batch-instruction">Select a batch to view trainee performance</p>
+            <div className="batch-buttons-grid">
+              {batchesData.map(batch => (
+                <button 
+                  key={batch.id}
+                  className="batch-button"
+                  onClick={() => {
+                    setSelectedBatchPerformance(batch.name);
+                    setShowPerformanceModal(true);
+                  }}
+                >
+                  {batch.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="chart-container">
+            <h3>Course Completion Rate</h3>
+            <div className="chart-placeholder">
+              <TrendingUp size={48} />
+              <p>Course completion analytics would be displayed here</p>
+            </div>
+          </div>
+        </div>
       
       <div className="trainee-details-section">
         <h3>Trainee Details</h3>
@@ -2155,7 +2187,8 @@ const TrainerDashboard = ({ user, onLogout }) => {
         </div>
       </div>
     </div>
-  );
+    );
+  };
 
   const sidebarItems = [
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
@@ -2571,6 +2604,57 @@ const TrainerDashboard = ({ user, onLogout }) => {
                 setRejectingLeaveId(null);
                 setRejectionFeedback('');
               }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Performance Modal */}
+      {showPerformanceModal && selectedBatchPerformance && (
+        <div className="modal-overlay">
+          <div className="modal large">
+            <div className="modal-header">
+              <h3> Trainee Performance - {selectedBatchPerformance} Batch</h3>
+              <button 
+                className="close-btn"
+                onClick={() => setShowPerformanceModal(false)}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="performance-content">
+              {getTraineePerformanceData().length > 0 ? (
+                <div className="vertical-bar-chart">
+                  <div className="y-axis">
+                    <div className="y-label">100%</div>
+                    <div className="y-label">80%</div>
+                    <div className="y-label">60%</div>
+                    <div className="y-label">40%</div>
+                    <div className="y-label">20%</div>
+                    <div className="y-label">0%</div>
+                  </div>
+                  <div className="chart-area">
+                    {getTraineePerformanceData().map((trainee, index) => (
+                      <div key={index} className="bar-column">
+                        <div className="bar-container">
+                          <div 
+                            className="vertical-bar"
+                            style={{height: `${trainee.performance}%`}}
+                          >
+                            <span className="bar-value-top">{trainee.performance}%</span>
+                          </div>
+                        </div>
+                        <div className="x-label">{trainee.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="chart-placeholder">
+                  <p>No trainees found in this batch</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

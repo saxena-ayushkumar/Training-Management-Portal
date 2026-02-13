@@ -440,3 +440,491 @@
     width: 100%;
   }
 }
+
+
+/* Batch Performance Selector */
+.batch-performance-selector {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.batch-select {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+}
+
+.batch-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.view-performance-btn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.view-performance-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.view-performance-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Performance Modal */
+.performance-content {
+  padding: 1.5rem;
+}
+
+.performance-chart h4 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.bar-chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.trainee-bar-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.trainee-label {
+  min-width: 150px;
+  font-weight: 600;
+  color: #333;
+}
+
+.bars-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bar-label {
+  min-width: 100px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.bar-background {
+  flex: 1;
+  height: 30px;
+  background: #f0f0f0;
+  border-radius: 15px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  border-radius: 15px;
+  transition: width 0.5s ease;
+}
+
+.bar-fill.performance {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.bar-fill.attendance {
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+}
+
+.bar-value {
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.performance-legend {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-color {
+  width: 30px;
+  height: 15px;
+  border-radius: 4px;
+}
+
+.legend-color.performance {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.legend-color.attendance {
+  background: linear-gradient(90deg, #4CAF50, #45a049);
+}
+
+@media (max-width: 768px) {
+  .trainee-bar-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .trainee-label {
+    min-width: auto;
+  }
+  
+  .bars-wrapper {
+    width: 100%;
+  }
+  
+  .batch-performance-selector {
+    flex-direction: column;
+  }
+  
+  .batch-select {
+    width: 100%;
+  }
+  
+  .view-performance-btn {
+    width: 100%;
+  }
+}
+
+/* Chart Header */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.chart-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+/* Performance Bar Chart */
+.performance-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.performance-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.trainee-name-label {
+  min-width: 150px;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.bar-wrapper {
+  flex: 1;
+}
+
+.bar-track {
+  width: 100%;
+  height: 35px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill-performance {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  transition: width 0.5s ease;
+  border-radius: 8px;
+}
+
+.bar-percentage {
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* Vertical Bar Chart */
+.vertical-bar-chart {
+  display: flex;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  min-height: 400px;
+}
+
+.y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-right: 1rem;
+  border-right: 2px solid #333;
+  min-width: 50px;
+}
+
+.y-label {
+  font-size: 0.85rem;
+  color: #666;
+  font-weight: 600;
+}
+
+.chart-area {
+  flex: 1;
+  display: flex;
+  gap: 2rem;
+  align-items: flex-end;
+  border-bottom: 2px solid #333;
+  padding-bottom: 1rem;
+}
+
+.bar-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bar-container {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.vertical-bar {
+  width: 60px;
+  background: linear-gradient(180deg, #764ba2, #667eea);
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  transition: height 0.5s ease;
+  min-height: 20px;
+}
+
+.bar-value-top {
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 700;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.x-label {
+  font-size: 0.85rem;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+  word-wrap: break-word;
+  max-width: 100px;
+}
+
+@media (max-width: 768px) {
+  .vertical-bar-chart {
+    overflow-x: auto;
+  }
+  
+  .chart-area {
+    min-width: max-content;
+  }
+  
+  .vertical-bar {
+    width: 40px;
+  }
+}
+
+/* Batch Selection Buttons */
+.batch-instruction {
+  text-align: center;
+  color: #666;
+  margin: 1rem 0;
+  font-size: 1rem;
+}
+
+.batch-buttons-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  max-width: 300px;
+}
+
+.batch-button {
+  padding: 0.75rem 1.5rem;
+  background: #f8f9fa;
+  color: #333;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: none;
+  text-align: left;
+}
+
+.batch-button:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+  transform: none;
+  box-shadow: none;
+}
+
+.batch-button:active {
+  transform: none;
+}
+
+/* X-axis labels below bars */
+.x-axis-labels {
+  display: flex;
+  gap: 2rem;
+  padding-left: 66px;
+  margin-top: 0.5rem;
+}
+
+.x-axis-labels .x-label {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+/* Bar column with name below */
+.bar-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bar-column .x-label {
+  font-size: 0.85rem;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+  word-wrap: break-word;
+  max-width: 80px;
+}
+
+/* Position names below x-axis */
+.chart-area {
+  padding-bottom: 0 !important;
+}
+
+.bar-column .x-label {
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: none;
+}
+
+/* Proper bar graph layout */
+.vertical-bar-chart {
+  display: flex;
+  gap: 1rem;
+  padding: 2rem 1rem 1rem 1rem;
+  min-height: 450px;
+}
+
+.chart-area {
+  flex: 1;
+  display: flex;
+  gap: 2rem;
+  align-items: flex-end;
+  border-bottom: 3px solid #333;
+  padding-bottom: 0;
+  position: relative;
+}
+
+.bar-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bar-container {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: 0;
+}
+
+.bar-column .x-label {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+  word-wrap: break-word;
+  max-width: 100px;
+  line-height: 1.2;
+}
+
+/* Ensure bars start from 0 at x-axis */
+.vertical-bar {
+  width: 60px;
+  background: linear-gradient(180deg, #764ba2, #667eea);
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  transition: height 0.5s ease;
+  min-height: 0;
+}
+
+.bar-container {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-bottom: 0;
+  position: relative;
+}
