@@ -51,6 +51,7 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 
 # Sensitive files
+!**/ForgotPassword.js
 *password*
 *secret*
 *key*
