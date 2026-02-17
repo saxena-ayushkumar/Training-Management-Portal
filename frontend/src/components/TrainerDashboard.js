@@ -4,6 +4,7 @@ import {
   Calendar, BarChart3, Eye, BookOpen, Clock, Award, CheckCircle, 
   PlayCircle, PauseCircle, Activity, TrendingUp, UserCheck, Bell, CalendarDays
 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useAppContext } from '../context/AppContext';
 import './TrainerDashboard.css';
 
@@ -2625,31 +2626,30 @@ const TrainerDashboard = ({ user, onLogout }) => {
             
             <div className="performance-content">
               {getTraineePerformanceData().length > 0 ? (
-                <div className="vertical-bar-chart">
-                  <div className="y-axis">
-                    <div className="y-label">100%</div>
-                    <div className="y-label">80%</div>
-                    <div className="y-label">60%</div>
-                    <div className="y-label">40%</div>
-                    <div className="y-label">20%</div>
-                    <div className="y-label">0%</div>
-                  </div>
-                  <div className="chart-area">
-                    {getTraineePerformanceData().map((trainee, index) => (
-                      <div key={index} className="bar-column">
-                        <div className="bar-container">
-                          <div 
-                            className="vertical-bar"
-                            style={{height: `${trainee.performance}%`}}
-                          >
-                            <span className="bar-value-top">{trainee.performance}%</span>
-                          </div>
-                        </div>
-                        <div className="x-label">{trainee.name}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={getTraineePerformanceData()} margin={{ top: 20, right: 30, left: 20, bottom: 80 }} barSize={60}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="name" 
+                      angle={0} 
+                      textAnchor="middle" 
+                      height={80}
+                      tick={{ fontSize: 14, fontWeight: 600, fill: '#333' }}
+                    />
+                    <YAxis 
+                      label={{ value: 'Performance (%)', angle: -90, position: 'insideLeft' }}
+                      domain={[0, 100]}
+                    />
+                    <Tooltip />
+                    <Bar dataKey="performance" fill="url(#colorGradient)" radius={[8, 8, 0, 0]} />
+                    <defs>
+                      <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#764ba2" />
+                        <stop offset="100%" stopColor="#667eea" />
+                      </linearGradient>
+                    </defs>
+                  </BarChart>
+                </ResponsiveContainer>
               ) : (
                 <div className="chart-placeholder">
                   <p>No trainees found in this batch</p>
