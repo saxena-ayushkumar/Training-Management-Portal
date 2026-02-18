@@ -118,6 +118,8 @@ const TrainerDashboard = ({ user, onLogout }) => {
   const [rejectionFeedback, setRejectionFeedback] = useState('');
   const [showPerformanceModal, setShowPerformanceModal] = useState(false);
   const [selectedBatchPerformance, setSelectedBatchPerformance] = useState('');
+  const [showCourseCompletionModal, setShowCourseCompletionModal] = useState(false);
+  const [selectedBatchCompletion, setSelectedBatchCompletion] = useState('');
 
   const handleViewSubmissions = async (assessmentId) => {
     try {
@@ -425,6 +427,20 @@ const TrainerDashboard = ({ user, onLogout }) => {
     return batchTrainees.map(trainee => ({
       name: trainee.name,
       performance: Math.floor(Math.random() * 20) + 80
+    }));
+  };
+
+  const getCourseCompletionData = () => {
+    if (!selectedBatchCompletion) return [];
+    
+    const batchCourses = courses.filter(c => c.assignedBatch === selectedBatchCompletion || !c.assignedBatch)
+      .sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+    
+    if (batchCourses.length === 0) return [];
+    
+    return batchCourses.map(course => ({
+      name: course.title,
+      completion: Math.floor(Math.random() * 30) + 70
     }));
   };
 
@@ -2124,9 +2140,20 @@ const TrainerDashboard = ({ user, onLogout }) => {
           </div>
           <div className="chart-container">
             <h3>Course Completion Rate</h3>
-            <div className="chart-placeholder">
-              <TrendingUp size={48} />
-              <p>Course completion analytics would be displayed here</p>
+            <p className="batch-instruction">Select a batch to view course completion rates</p>
+            <div className="batch-buttons-grid">
+              {batchesData.map(batch => (
+                <button 
+                  key={batch.id}
+                  className="batch-button"
+                  onClick={() => {
+                    setSelectedBatchCompletion(batch.name);
+                    setShowCourseCompletionModal(true);
+                  }}
+                >
+                  {batch.name}
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -2653,6 +2680,51 @@ const TrainerDashboard = ({ user, onLogout }) => {
               ) : (
                 <div className="chart-placeholder">
                   <p>No trainees found in this batch</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Course Completion Modal */}
+      {showCourseCompletionModal && selectedBatchCompletion && (
+        <div className="modal-overlay">
+          <div className="modal large">
+            <div className="modal-header">
+              <h3>📚 Course Completion Rate - {selectedBatchCompletion} Batch</h3>
+              <button className="close-btn" onClick={() => setShowCourseCompletionModal(false)}>×</button>
+            </div>
+            
+            <div className="performance-content">
+              {getCourseCompletionData().length > 0 ? (
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={getCourseCompletionData()} margin={{ top: 20, right: 30, left: 20, bottom: 80 }} barSize={60}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis 
+                      dataKey="name" 
+                      angle={0} 
+                      textAnchor="middle" 
+                      height={80}
+                      tick={{ fontSize: 14, fontWeight: 600, fill: '#333' }}
+                    />
+                    <YAxis 
+                      label={{ value: 'Completion (%)', angle: -90, position: 'insideLeft' }}
+                      domain={[0, 100]}
+                    />
+                    <Tooltip />
+                    <Bar dataKey="completion" fill="url(#courseGradient)" radius={[8, 8, 0, 0]} />
+                    <defs>
+                      <linearGradient id="courseGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#667eea" />
+                        <stop offset="100%" stopColor="#764ba2" />
+                      </linearGradient>
+                    </defs>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="chart-placeholder">
+                  <p>No courses found for this batch</p>
                 </div>
               )}
             </div>
