@@ -2642,7 +2642,7 @@ const TrainerDashboard = ({ user, onLogout }) => {
         <div className="modal-overlay">
           <div className="modal large">
             <div className="modal-header">
-              <h3> Trainee Performance - {selectedBatchPerformance} Batch</h3>
+              <h3> Trainee Performance - {selectedBatchPerformance}</h3>
               <button 
                 className="close-btn"
                 onClick={() => setShowPerformanceModal(false)}
@@ -2692,7 +2692,7 @@ const TrainerDashboard = ({ user, onLogout }) => {
         <div className="modal-overlay">
           <div className="modal large">
             <div className="modal-header">
-              <h3>📚 Course Completion Rate - {selectedBatchCompletion} Batch</h3>
+              <h3>📚 Course Completion Rate - {selectedBatchCompletion}</h3>
               <button className="close-btn" onClick={() => setShowCourseCompletionModal(false)}>×</button>
             </div>
             
