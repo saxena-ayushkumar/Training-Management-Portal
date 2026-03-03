@@ -1,3 +1,7 @@
+.analytics-charts {
+  margin-bottom: 1rem;
+}
+
 /* Additional styles for enhanced trainee management */
 
 .pending-requests-section {
@@ -47,8 +51,22 @@
   border-color: #4CAF50;
 }
 
+.analytics-charts {
+  margin-bottom: 0;
+}
+
+.chart-container {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.chart-display {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
 .trainee-details-section {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 
 .trainee-details-section h3 {
